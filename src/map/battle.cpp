@@ -2273,7 +2273,7 @@ int64 battle_addmastery(map_session_data *sd,struct block_list *target,int64 dmg
 #endif
 		case W_DAGGER:
 			if((skill = pc_checkskill(sd,SM_SWORD)) > 0)
-				damage += (skill * 4);
+				damage += (skill * 5);
 			if((skill = pc_checkskill(sd,GN_TRAINING_SWORD)) > 0)
 				damage += skill * 10;
 			break;

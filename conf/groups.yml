@@ -46,13 +46,70 @@ Body:
     Name: Player
     Level: 0
     Commands:
+      commands: true
+      charcommands: true
+      help: true
+      rates: true
+      uptime: true
+      showdelay: true
+      exp: true
+      mobinfo: true
+      iteminfo: true
+      whodrops: true
+      time: true
+      jailtime: true
+      hominfo: true
+      homstats: true
+      showexp: true
+      showzeny: true
+      whereis: true
+      # Feature commands
+      refresh: true
+      noask: true
+      noks: true
+      autoloot: true
+      alootid: true
+      autoloottype: true
+      autotrade: true
+      request: true
+      # go: true
+      breakguild: true
+      channel: true
+      load: true
+      save: true
+     # jump: true
+      kill: true
+      join: true
+      duel: true
+      invite: true
+      accept: true
+      reject: true
+      leave: true
+      mail: true
+      feelreset: true
+      storage: true
+     # guildstorage: true
+      changegm: true
+      changeleader: true
+      idsearch: true
+      petrename: true
+      pettalk: true
+      trade: true
       changedress: true
-      resurrect: true
+      who: true
+      who2: true
+      who3: true
+      go: true
+      
     Permissions:
       # without this basic permissions regular players could not trade or party
       can_trade: true
       can_party: true
       attendance: true
+      skill_unconditional: false
+      all_skill: false
+     # all_equipment: true
+     # item_unconditional: true
   - Id: 1
     Name: Super Player
     # Can do everything Players can and more
@@ -216,7 +273,6 @@ Body:
       hack_info: true
       any_warp: true
       view_hpmeter: true
-      macro_detect: true
   - Id: 99
     Name: Admin
     Level: 99
@@ -229,18 +285,16 @@ Body:
       can_party: true
       command_enable: true
       all_skill: false
-      all_equipment: false
-      skill_unconditional: false
+      all_equipment: true
+      skill_unconditional: true
       use_check: true
       use_changemaptype: true
       all_commands: true
       channel_admin: true
       can_trade_bounded: true
-      item_unconditional: false
+      item_unconditional: true
       bypass_stat_onclone: true
       bypass_max_stat: true
-      macro_register: true
-      trade_unconditional: true
       #all_permission: true
 
 Footer:

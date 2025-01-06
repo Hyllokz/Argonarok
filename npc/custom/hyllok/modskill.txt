@@ -1,0 +1,14 @@
+-	script	ArgoBonusStats	-1,{
+
+//=== Removendo bonus ao deslogar
+	OnPCLogouEvent:
+	bonus_script_clear 1;
+
+//=== Ao logar, aplicar os bonus/buffs
+	OnPCLoginEvent:
+
+//Passivas
+//Sword Mastery
+bonus_script "{ bonus bMatk, (getskilllv(2) * 5); }",86400,1024;
+
+}
