@@ -1,72 +1,122 @@
-<img src="doc/logo.png" align="right" height="90" />
 
-# rAthena
-![clang](https://img.shields.io/github/actions/workflow/status/rathena/rathena/build_servers_clang.yml?label=clang%20build&logo=llvm) ![cmake](https://img.shields.io/github/actions/workflow/status/rathena/rathena/build_servers_cmake.yml?label=cmake%20build&logo=cmake) ![gcc](https://img.shields.io/github/actions/workflow/status/rathena/rathena/build_servers_gcc.yml?label=gcc%20build&logo=gnu) ![ms](https://img.shields.io/github/actions/workflow/status/rathena/rathena/build_servers_msbuild.yml?label=ms%20build&logo=visualstudio) ![GitHub](https://img.shields.io/github/license/rathena/rathena.svg) ![commit activity](https://img.shields.io/github/commit-activity/w/rathena/rathena) ![GitHub repo size](https://img.shields.io/github/repo-size/rathena/rathena.svg)
-> rAthena is a collaborative software development project revolving around the creation of a robust massively multiplayer online role playing game (MMORPG) server package. Written in C++, the program is very versatile and provides NPCs, warps and modifications. The project is jointly managed by a group of volunteers located around the world as well as a tremendous community providing QA and support. rAthena is a continuation of the eAthena project.
+# Argonarok
 
-[Forum](https://rathena.org/board)|[Discord](https://rathena.org/discord)|[Wiki](https://github.com/rathena/rathena/wiki)|[FluxCP](https://github.com/rathena/FluxCP)|[Crowdfunding](https://rathena.org/board/crowdfunding/)|[Fork and Pull Request Q&A](https://rathena.org/board/topic/86913-pull-request-qa/)
---------|--------|--------|--------|--------|--------
+A handmade classic MMORPG server
 
-### Table of Contents
-1. [Prerequisites](#1-prerequisites)
-2. [Installation](#2-installation)
-3. [Troubleshooting](#3-troubleshooting)
-4. [More Documentation](#4-more-documentation)
-5. [How to Contribute](#5-how-to-contribute)
-6. [License](#6-license)
 
-## 1. Prerequisites
-Before installing rAthena there are certain tools and applications you will need which
-differs between the varying operating systems available.
+## Documentação
 
-### Hardware
-Hardware Type | Minimum | Recommended
-------|------|------
-CPU | 1 Core | 2 Cores
-RAM | 1 GB | 2 GB
-Disk Space | 300 MB | 500 MB
+[Arquivo de sugestões](https://docs.google.com/document/d/1_G3Tp0AwD97i4ozIHX2gTTzPvQJ5SrKtZo-SMoI5Vzg/edit?tab=t.0)
 
-### Operating System & Preferred Compiler
-Operating System | Compiler
-------|------
-Linux  | [gcc-6 or newer](https://www.gnu.org/software/gcc/gcc-6/) / [Make](https://www.gnu.org/software/make/)
-Windows | [MS Visual Studio 2017 or newer](https://www.visualstudio.com/downloads/)
+## Instalando o Git e clonando o repositório
+• Baixe e instale o [Git](https://git-scm.com/downloads)
 
-### Required Applications
-Application | Name
-------|------
-Database | [MySQL 5 or newer](https://www.mysql.com/downloads/) / [MariaDB 5 or newer](https://downloads.mariadb.org/)
-Git | [Windows](https://gitforwindows.org/) / [Linux](https://git-scm.com/download/linux)
+• Abra o `cmd` e digite `git --version` para se certificar que o Git foi instalado, em seguida feche o cmd
 
-### Optional Applications
-Application | Name
-------|------
-Database | [MySQL Workbench 5 or newer](http://www.mysql.com/downloads/workbench/)
+• Em seu PC, navegue até uma pasta de sua preferência para baixar o código-fonte do servidor, em seguida, clique com o botão direito em uma área limpa da pasta e vá até a opção `Abrir Prompt de Comando aqui/Abrir PowerShell`
 
-## 2. Installation 
+• Com o terminal aberto, digite `git clone https://github.com/Hyllokz/Argonarok` e pressione Enter — esse procedimento irá baixar os arquivos na pasta escolhida
 
-### Full Installation Instructions
-  * [Windows](https://github.com/rathena/rathena/wiki/Install-on-Windows)
-  * [CentOS](https://github.com/rathena/rathena/wiki/Install-on-Centos)
-  * [Debian](https://github.com/rathena/rathena/wiki/Install-on-Debian)
-  * [FreeBSD](https://github.com/rathena/rathena/wiki/Install-on-FreeBSD)
+• Iremos editar diversos tipos de arquivo, para isso, recomendo a instalação do [Notepad++](https://notepad-plus-plus.org/)
 
-## 3. Troubleshooting
+## Conhecendo os diretórios e arquivos
 
-If you're having problems with starting your server, the first thing you should
-do is check what's happening on your consoles. More often that not, all support issues
-can be solved simply by looking at the error messages given. Check out the [wiki](https://github.com/rathena/rathena/wiki)
-or [forums](https://rathena.org/forum) if you need more support on troubleshooting.
+• Dentro da pasta do código-fonte, temos vários diretórios e arquivos que iremos utilizar para as edições, sendo eles:
 
-## 4. More Documentation
-rAthena has a large collection of help files and sample NPC scripts located in the /doc/
-directory. These include detailed explanations of NPC script commands, atcommands (@),
-group permissions, item bonuses, and packet structures, among many other topics. We
-recommend that all users take the time to look over this directory before asking for
-assistance elsewhere.
+### Banco de Dados
+`db\re` - Banco de dados, onde ficam os arquivos contendo as informações sobre itens, mobs, skills, árvore de skills, entre outros. A linguagem aqui é `yaml`
 
-## 5. How to Contribute
-Details on how to contribute to rAthena can be found in [CONTRIBUTING.md](https://github.com/rathena/rathena/blob/master/.github/CONTRIBUTING.md)!
+### O arquivo que mais utilizaremos nessa pasta é `skill_db.yml`
+Ele é contém as informações de cooldown, requisitos de item para skill, custos de HP/SP/Zeny
+###
+### Código-fonte
+`src\map` - Local onde ficam os arquivos contendo o código-fonte, aqui teremos as fórmulas. A linguagem aqui é `C++`
 
-## 6. License
-Copyright (c) rAthena Development Team - Licensed under [GNU General Public License v3.0](https://github.com/rathena/rathena/blob/master/LICENSE)
+### Arquivos e suas funções
+
+• battle.cpp - um dos principais arquivos, contém fórmulas de skill
+
+• skill.cpp - outro arquivo importante contendo fórmulas
+
+• skill.hpp - arquivo de referência para pegar nome interno das skills
+
+• status.cpp - arquivo contendo todos os buffs/debuffs/mudanças de status, aqui os prefixos começam com `SC_`, que significa `status_change`
+
+• pc.cpp - arquivo contendo outras fórmulas
+
+### Como saber qual arquivo editar?
+O Notepad++ tem uma função de busca de termos em todos arquivos de determinado diretório, isso ajuda a encontrar todas as incidências de certa skill nos arquivos.
+Para isso, utilize o atalho `Ctrl+F`, na aba `Localizar nos arquivos`, insira o termo desejado na caixa de texto `Localizar:` e escolha a pasta `Argonarok\src\map` na opção `Pasta:`
+
+### Qual termo devo pesquisar?
+Não existe fórmula mágica, mas vamos ver dois exemplos que podem ajudar:
+
+• Exemplo 1: modificar a skill `Magnum Break` de `Swordsman`
+    
+Pesquise o nome da skill no [RateMyServer](https://ratemyserver.net/), ele irá retornar o **Name**, **AegisName** e **ID**.
+
+`Sendo eles, respectivamente: Magnum Break, SM_MAGNUM, 7;`
+
+O que nos interessa é quase sempre o **AegisName**, `SM_MAGNUM`
+
+Tendo essa informação, use o `Ctrl+F` para localizar o termo na pasta `src\map` e analise as incidências.
+###
+• Exemplo 2: modificar a skill `Endure` de `Swordsman`
+    
+Pesquise o nome da skill no [RateMyServer](https://ratemyserver.net/), ele irá retornar o **Name**, **AegisName** e **ID**.
+
+`Sendo eles, respectivamente: Endure, SM_ENDURE, 8;`
+
+O que nos interessa é quase sempre o **AegisName**, `SM_ENDURE`
+Porém, note que `SM_ENDURE` é um buff que provoca uma mudança de status, então devemos considerar mudar o prefixo da busca para `SC_ENDURE`, já que se trata de um `status_change`
+Tendo essa informação, vá até o arquivo `src\map\status.cpp` e localize as incidências de `SC_ENDURE`
+###
+
+# Boas práticas de programação
+
+Boas práticas de programação são um conjunto de convenções que ajudam a tornar o código de computador mais legível e eficiente, facilitando a manutenção e a colaboração entre programadores. 
+
+Algumas boas práticas de programação são:
+
+    Escrever código limpo e legível: O código deve ser compreensível por outros desenvolvedores e por você mesmo no futuro. 
+    Não apagar conteúdo: Ao realizar uma modificação, comente o trecho do código original, para mantermos uma referência
+    Identificar sua modificação: Ao início de seu código, faça um comentário dizendo seu nome e o que o trecho abaixo deverá fazer
+
+# Utilizando o Git para baixar e enviar as modificações
+
+### Sempre antes de iniciar modificações no código, é uma boa prática realizar um `git pull`
+
+Para baixar atualizações do Git, pode usar o comando git pull: 
+
+    Abra o terminal ou Prompt de Comandos e navegue até à pasta do projeto
+    Use o comando git pull 
+
+Para enviar atualizações do Git, pode seguir os seguintes passos: 
+
+    Garantir que as alterações no código estão salvas no ambiente de desenvolvimento local
+    Abrir o terminal ou Prompt de Comandos e navegar até à pasta do projeto
+    Executar os seguintes comandos do Git:
+        git add . Adiciona todas as alterações feitas no projeto para a área de preparação do Git
+        git commit -m "mensagem de commit": Cria um novo commit com todas as alterações que adicionou à área de preparação
+        git push: Envia todos os novos commits para o GitHub
+## Autores
+
+- [@Hyllokz](https://github.com/Hyllokz)
+
+
+## FAQ
+
+#### What is Argonarok?
+
+A highly customized classic MMORPG server, mixing original and legacy content
+
+#### For whom Argonarok is?
+
+Argonarok was designed for everybody who likes a classic style MMORPG gameplay experience, classes based, level and skill progression
+
+![Logo](https://i.imgur.com/08n24cg.png)
+
+
+## 🔗 Links
+[![portfolio](https://i.imgur.com/RQKbdq3.png)](https://argonarok.fun/)Download it now!
+
