@@ -14318,6 +14318,23 @@ void skill_identify(map_session_data *sd, int32 idx)
 
 	nullpo_retv(sd);
 
+	// Isso Chama random options para o tipo de equip
+	if(true){
+		switch(sd->inventory_data[idx]->type) {
+			case IT_WEAPON:
+				randomoption_weapon(sd, idx);
+				break;
+			case IT_ARMOR:
+				randomoption_armor(sd, idx);
+				break;
+			case IT_ACCESSORY:
+				randomoption_accessory(sd, idx);
+				break;
+			case default:
+				break;
+		}
+	}
+
 	sd->state.workinprogress = WIP_DISABLE_NONE;
 
 	if(idx >= 0 && idx < MAX_INVENTORY) {
