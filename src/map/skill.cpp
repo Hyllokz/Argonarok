@@ -14322,16 +14322,13 @@ void skill_identify(map_session_data *sd, int32 idx)
 	if(true){
 		switch(sd->inventory_data[idx]->type) {
 			case IT_WEAPON:
-				char message[256] = "Weapon";
-				intif_broadcast(message, strlen(message) + 1, BC_DEFAULT);
+				ShowWarning("Weapon", cmd);
 				break;
 			case IT_ARMOR:
-				char message[256] = "Armor";
-				intif_broadcast(message, strlen(message) + 1, BC_DEFAULT);
+				ShowWarning("Armor", cmd);
 				break;
 			case IT_ACCESSORY:
-				char message[256] = "Accessory";
-				intif_broadcast(message, strlen(message) + 1, BC_DEFAULT);
+				ShowWarning("Accessory", cmd);
 				break;
 			case default:
 				break;
