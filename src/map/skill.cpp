@@ -13897,23 +13897,6 @@ void skill_identify(map_session_data *sd, int32 idx)
 
 	nullpo_retv(sd);
 
-	// Isso Chama random options para o tipo de equip
-	if(true){
-		switch(sd->inventory_data[idx]->type) {
-			case IT_WEAPON:
-				ShowWarning("Weapon", cmd);
-				break;
-			case IT_ARMOR:
-				ShowWarning("Armor", cmd);
-				break;
-			case IT_ACCESSORY:
-				ShowWarning("Accessory", cmd);
-				break;
-			case default:
-				break;
-		}
-	}
-
 	sd->state.workinprogress = WIP_DISABLE_NONE;
 
 	if(idx >= 0 && idx < MAX_INVENTORY) {
