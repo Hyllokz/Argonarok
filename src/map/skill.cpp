@@ -14070,32 +14070,137 @@ void skill_repairweapon( map_session_data& sd, int32 idx ){
 	if( sd.status.char_id != target_sd->status.char_id )
 		clif_item_repaireffect( *target_sd, idx, false );
 }
+/*
+// =============================================
+// Resolve Random Option Group by Equipment Type
+// =============================================
+static int skill_resolve_random_group(struct item_data* id)
+{
+	if (!id)
+		return 0;
+
+	if (id->type == IT_WEAPON) {
+		switch (id->subtype) {
+
+		case W_DAGGER: return 7;
+
+		case W_1HSWORD:
+		case W_2HSWORD:
+		case W_1HSPEAR:
+		case W_2HSPEAR:
+		case W_1HAXE:
+		case W_2HAXE:
+		case W_MACE:
+		case W_2HMACE:
+		case W_KNUCKLE:
+			return 8;
+
+		case W_STAFF:
+		case W_2HSTAFF:
+			return 9;
+
+		case W_BOW: return 10;
+
+		case W_REVOLVER:
+		case W_RIFLE:
+		case W_GATLING:
+		case W_SHOTGUN:
+		case W_GRENADE:
+			return 11;
+
+		case W_HUUMA: return 12;
+
+		case W_MUSICAL:
+		case W_WHIP:
+			return 13;
+
+		case W_BOOK: return 14;
+		case W_KATAR: return 15;
+		}
+	}
+
+	if (id->type == IT_ARMOR) {
+
+		if (id->equip & (EQP_HEAD_TOP | EQP_HEAD_MID | EQP_HEAD_LOW))
+			return 1;
+
+		if (id->equip & EQP_ARMOR)
+			return 2;
+
+		if (id->equip & EQP_SHIELD)
+			return 3;
+
+		if (id->equip & EQP_SHOES)
+			return 4;
+
+		if (id->equip & EQP_GARMENT)
+			return 5;
+
+		if (id->equip & (EQP_ACC_L | EQP_ACC_R))
+			return 6;
+	}
+
+	return 0;
+}
+*/
+/*
+static void skill_apply_random_option(map_session_data* sd, int idx)
+{
+	if (!sd)
+		return;
+
+	if (idx < 0 || idx >= MAX_INVENTORY)
+		return;
+
+	struct item* it = &sd->inventory.u.items_inventory[idx];
+
+	if (it->nameid <= 0)
+		return;
+
+	struct item_data* id = itemdb_search(it->nameid);
+
+	if (!id)
+		return;
+/*
+	// Só equipamentos
+	if (id->type != IT_WEAPON && id->type != IT_ARMOR)
+		return;
+
+	// Não stackável
+	if (itemdb_isstackable2(id))
+		return;
+
+	// Não aplicar se já tiver option
+	for (int i = 0; i < MAX_ITEM_RDM_OPT; i++) {
+		if (it->option[i].id != 0)
+			return;
+	}
+*/
+/*
+	//int group_id = skill_resolve_random_group(id);
+	int group_id = 6;
+	if (group_id <= 0)
+		return;
+
+	std::shared_ptr<s_random_opt_group> group =
+		random_option_group.find(group_id);
+
+	if (group != nullptr) {
+		group->apply(*it);
+		clif_inventorylist(sd); // força refresh visual
+	}
+}
+*/
 
 /*==========================================
  * Item Appraisal
  *------------------------------------------*/
+ 
 void skill_identify(map_session_data *sd, int32 idx)
 {
 	bool failure = true;
 
 	nullpo_retv(sd);
-
-	// Isso Chama random options para o tipo de equip
-	if(true){
-		switch(sd->inventory_data[idx]->type) {
-			case IT_WEAPON:
-				ShowWarning("Weapon", cmd);
-				break;
-			case IT_ARMOR:
-				ShowWarning("Armor", cmd);
-				break;
-			case IT_ACCESSORY:
-				ShowWarning("Accessory", cmd);
-				break;
-			case default:
-				break;
-		}
-	}
 
 	sd->state.workinprogress = WIP_DISABLE_NONE;
 
@@ -14112,6 +14217,51 @@ void skill_identify(map_session_data *sd, int32 idx)
 		npc_script_event( *sd, NPCE_IDENTIFY );
 	}
 }
+
+/*
+static void skill_apply_random_option_identify(struct item& item)
+{
+	std::shared_ptr<s_random_opt_group> group =
+		random_option_group.find(1); // FORÇANDO GRUPO 1 PARA TESTE
+
+	if (group != nullptr) {
+		group->apply(item);
+		ShowInfo("Aplicando random option via identify\n");
+	}
+}
+*/
+/*==========================================
+ * Item Appraisal with Random Options
+ *------------------------------------------*/
+ /*
+void skill_identify(map_session_data *sd, int32 idx)
+{
+	bool failure = true;
+
+	nullpo_retv(sd);
+
+	sd->state.workinprogress = WIP_DISABLE_NONE;
+
+	if(idx >= 0 && idx < MAX_INVENTORY) {
+		if(sd->inventory.u.items_inventory[idx].nameid > 0 &&
+		   sd->inventory.u.items_inventory[idx].identify == 0 ){
+
+			failure = false;
+			sd->inventory.u.items_inventory[idx].identify = 1;
+
+			// APLICA RANDOM OPTION FORÇADO
+			skill_apply_random_option_identify(sd->inventory.u.items_inventory[idx]);
+		}
+	}
+
+	clif_item_identified(*sd, idx, failure);
+
+	if(!failure) {
+		pc_setreg(sd, add_str("@identify_idx"), idx);
+		npc_script_event(*sd, NPCE_IDENTIFY);
+	}
+}
+*/
 
 /*==========================================
  * Weapon Refine [Celest]
