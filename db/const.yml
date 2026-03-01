@@ -47,6 +47,10 @@ Body:
     Value: 5
   - Name: REPUTATION_EP18
     Value: 3
+  # - Name: ADDZENY_KILLRACE_ALL
+  #   Value: 4
+  # - Name: ITEMDROP_PERCENT_ALL
+  #   Value: 5
 
 Footer:
   Imports:

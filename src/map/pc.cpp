@@ -5955,112 +5955,169 @@ int16 pc_search_inventory( const map_session_data* sd, t_itemid nameid) {
 // =============================================
 // Resolve Random Option Group by Equipment Type
 // =============================================
-static int pc_resolve_random_group(struct item_data* id)
+static uint16 pc_resolve_random_group(item_data* id)
 {
-	if (!id)
-		return 0;
+    if (id == nullptr)
+        return 0;
 
-	// =========================
-	// WEAPONS
-	// =========================
-	if (id->type == IT_WEAPON) {
-		switch (id->subtype) {
+    // Mapeamento de tipos de equipamento para grupos específicos
+    if ((id->equip & EQP_ACC_L) || (id->equip & EQP_ACC_R)) {
+        // Tenta encontrar o grupo por nome
+        uint16 group_id = 34;
+        if (random_option_group.option_get_id("ACCESSORY_RANDOM_OPTIONS", group_id)) {
+            return group_id;
+        }
+    }
+    
+    // Equipamento de cabeça topo
+    if ((id->equip & EQP_HEAD_TOP)) {
+        uint16 group_id = 35;
+        if (random_option_group.option_get_id("HEADGEAR_TOP_RANDOM_OPTIONS", group_id)) {
+            return group_id;
+        }
+    }
 
-		case W_DAGGER:
-			return 7;
+	// Equipamento de cabeça meio
+    if ((id->equip & EQP_HEAD_MID)) {
+        uint16 group_id = 36;
+        if (random_option_group.option_get_id("HEADGEAR_MID_RANDOM_OPTIONS", group_id)) {
+            return group_id;
+        }
+    }
 
-		case W_1HSWORD:
-		case W_2HSWORD:
-		case W_1HSPEAR:
-		case W_2HSPEAR:
-		case W_1HAXE:
-		case W_2HAXE:
-		case W_MACE:
-		case W_2HMACE:
-		case W_KNUCKLE:
-			return 8;
+	// Equipamento de cabeça baixo
+    if ((id->equip & EQP_HEAD_LOW)) {
+        uint16 group_id = 37;
+        if (random_option_group.option_get_id("HEADGEAR_LOW_RANDOM_OPTIONS", group_id)) {
+            return group_id;
+        }
+    }
+    
+    // Armadura
+    if (id->equip & EQP_ARMOR) {
+        uint16 group_id = 38;
+        if (random_option_group.option_get_id("ARMOR_RANDOM_OPTIONS", group_id)) {
+            return group_id;
+        }
+    }
+    
+    // Sapato
+    if (id->equip & EQP_SHOES) {
+        uint16 group_id = 39;
+        if (random_option_group.option_get_id("SHOES_RANDOM_OPTIONS", group_id)) {
+            return group_id;
+        }
+    }
+    
+    // Capa
+    if (id->equip & EQP_GARMENT) {
+        uint16 group_id = 40;
+        if (random_option_group.option_get_id("GARMENT_RANDOM_OPTIONS", group_id)) {
+            return group_id;
+        }
+    }
 
-		case W_STAFF:
-		case W_2HSTAFF:
-			return 9;
-
-		case W_BOW:
-			return 10;
-
-		case W_REVOLVER:
-		case W_RIFLE:
-		case W_GATLING:
-		case W_SHOTGUN:
-		case W_GRENADE:
-			return 11;
-
-		case W_HUUMA:
-			return 12;
-
-		case W_MUSICAL:
-		case W_WHIP:
-			return 13;
-
-		case W_BOOK:
-			return 14;
-
-		case W_KATAR:
-			return 15;
+	// Armas - Adagas
+	if ((id->equip & EQP_HAND_L) || (id->equip & EQP_HAND_R)) {
+		if (id->subtype == W_DAGGER || id->subtype == W_KATAR) {
+			uint16 group_id = 41;
+			if (random_option_group.option_get_id("DAGGER_RANDOM_OPTIONS", group_id)) {
+				return group_id;
+			}
+		}
+		// Espadas, Lanças, Machados
+		else if (id->subtype == W_1HSWORD || id->subtype == W_2HSWORD ||
+				 id->subtype == W_1HSPEAR || id->subtype == W_2HSPEAR ||
+				 id->subtype == W_1HAXE || id->subtype == W_2HAXE ||
+				 id->subtype == W_MACE || id->subtype == W_2HMACE ||
+				 id->subtype == W_KNUCKLE) {
+			uint16 group_id = 42;
+			if (random_option_group.option_get_id("SWORD_RANDOM_OPTIONS", group_id)) {
+				return group_id;
+			}
+		}
+		// Cajados
+		else if (id->subtype == W_STAFF || id->subtype == W_2HSTAFF) {
+			uint16 group_id = 43;
+			if (random_option_group.option_get_id("STAFF_RANDOM_OPTIONS", group_id)) {
+				return group_id;
+			}
+		}
+		// Arcos
+		else if (id->subtype == W_BOW) {
+			uint16 group_id = 44;
+			if (random_option_group.option_get_id("BOW_RANDOM_OPTIONS", group_id)) {
+				return group_id;
+			}
+		}
+		// Armas de Fogo
+		else if (id->subtype == W_REVOLVER || id->subtype == W_RIFLE ||
+				 id->subtype == W_GATLING || id->subtype == W_SHOTGUN ||
+				 id->subtype == W_GRENADE) {
+			uint16 group_id = 45;
+			if (random_option_group.option_get_id("GUN_RANDOM_OPTIONS", group_id)) {
+				return group_id;
+			}
+		}
+		// Huuma
+		else if (id->subtype == W_HUUMA) {
+			uint16 group_id = 46;
+			if (random_option_group.option_get_id("HUUMA_RANDOM_OPTIONS", group_id)) {
+				return group_id;
+			}
+		}
+		// Musicais/Chicotes
+		else if (id->subtype == W_MUSICAL || id->subtype == W_WHIP) {
+			uint16 group_id = 47;
+			if (random_option_group.option_get_id("MUSICAL_RANDOM_OPTIONS", group_id)) {
+				return group_id;
+			}
+		}
+		// Livros
+		else if (id->subtype == W_BOOK) {
+			uint16 group_id = 48;
+			if (random_option_group.option_get_id("BOOK_RANDOM_OPTIONS", group_id)) {
+				return group_id;
+			}
 		}
 	}
 
-	// =========================
-	// ARMORS
-	// =========================
-	if (id->type == IT_ARMOR) {
-
-		if (id->equip & (EQP_HEAD_TOP | EQP_HEAD_MID | EQP_HEAD_LOW))
-			return 1;
-
-		if (id->equip & EQP_ARMOR)
-			return 2;
-
-		if (id->equip & EQP_SHIELD)
-			return 3;
-
-		if (id->equip & EQP_SHOES)
-			return 4;
-
-		if (id->equip & EQP_GARMENT)
-			return 5;
-
-		if (id->equip & (EQP_ACC_L | EQP_ACC_R))
-			return 6;
-	}
-
-	return 0;
+    // Se nenhum grupo específico for encontrado, tenta usar um grupo padrão
+    uint16 group_id = 0;
+    if (random_option_group.option_get_id("Group_1", group_id)) {
+        return group_id;
+    }
+    
+    return 0;
 }
 
 // =============================================
 // Apply Random Option Automatically
 // =============================================
-static void pc_apply_random_option(struct item_data* id, struct item& it)
+static void pc_apply_random_option(item_data* id, item& it)
 {
-	// Não aplicar em stackáveis
-	if (itemdb_isstackable2(id))
-		return;
+    if (id == nullptr)
+        return;
 
-	// Não aplicar se já tiver random option
-	for (int i = 0; i < MAX_ITEM_RDM_OPT; i++) {
-		if (it.option[i].id != 0)
-			return;
-	}
+    // Resolve qual grupo usar
+    uint16 group_id = pc_resolve_random_group(id);
+    
+    if (group_id == 0) {
+        ShowWarning("pc_apply_random_option: Nenhum grupo de random option encontrado para item %u (%s)\n", 
+                   id->nameid, id->name.c_str());
+        return;
+    }
 
-	int group_id = pc_resolve_random_group(id);
-	if (group_id <= 0) // No random option group for this item type
-		return;
+    // Busca o grupo resolvido
+    std::shared_ptr<s_random_opt_group> group = random_option_group.find(group_id);
+    
+    if (group == nullptr) {
+        ShowWarning("pc_apply_random_option: Grupo %hu não encontrado na database\n", group_id);
+        return;
+    }
 
-	std::shared_ptr<s_random_opt_group> group =
-		random_option_group.find(group_id);
-
-	if (group != nullptr) {
-		group->apply(it);
-	}
+    // Aplica as opções aleatórias
+    group->apply(it);
 }
 
 enum e_additem_result pc_additem(map_session_data *sd,struct item *item,int32 amount,e_log_pick_type log_type, bool favorite) {

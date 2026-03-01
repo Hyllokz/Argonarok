@@ -16218,3 +16218,519 @@ Body:
             MinValue: 1
             MaxValue: 5
             Chance: 200
+  - Id: 34 #Acessórios
+    Group: ACCESSORY_RANDOM_OPTIONS
+    Slots:
+      - Slot: 1
+        Options:
+          - Option: VAR_STRAMOUNT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 10000
+          - Option: VAR_AGIAMOUNT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 10000
+          - Option: VAR_VITAMOUNT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 10000
+          - Option: VAR_INTAMOUNT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 10000
+          - Option: VAR_DEXAMOUNT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 10000
+          - Option: VAR_LUKAMOUNT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 10000
+    MaxRandom: 4
+    Random:
+          - Option: VAR_STRAMOUNT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 3000
+          - Option: VAR_AGIAMOUNT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 3000
+          - Option: VAR_VITAMOUNT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 3000
+          - Option: VAR_INTAMOUNT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 3000
+          - Option: VAR_DEXAMOUNT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 3000
+          - Option: VAR_LUKAMOUNT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 3000
+  - Id: 35 #Equipamentos de Cabeça TOP
+    Group: HEADGEAR_TOP_RANDOM_OPTIONS
+    Slots:
+      - Slot: 1
+        Options:
+          - Option: VAR_DEXAMOUNT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 10000
+    MaxRandom: 4
+    Random:
+          - Option: VAR_ITEMDEFPOWER
+            MinValue: 10
+            MaxValue: 25
+            Chance: 3000
+          - Option: VAR_MDEFPOWER
+            MinValue: 10
+            MaxValue: 25
+            Chance: 3000
+          - Option: ATTR_TOLERACE_ALL
+            MinValue: 10
+            MaxValue: 20
+            Chance: 3000
+  - Id: 36 #Equipamentos de Cabeça MID
+    Group: HEADGEAR_MID_RANDOM_OPTIONS
+    Slots:
+      - Slot: 1
+        Options:
+          - Option: VAR_STRAMOUNT
+            MinValue: 1
+            MaxValue: 2
+            Chance: 10000
+          - Option: VAR_AGIAMOUNT
+            MinValue: 1
+            MaxValue: 2
+            Chance: 10000
+          - Option: VAR_VITAMOUNT
+            MinValue: 1
+            MaxValue: 2
+            Chance: 10000
+          - Option: VAR_INTAMOUNT
+            MinValue: 1
+            MaxValue: 2
+            Chance: 10000
+          - Option: VAR_DEXAMOUNT
+            MinValue: 1
+            MaxValue: 2
+            Chance: 10000
+          - Option: VAR_LUKAMOUNT
+            MinValue: 1
+            MaxValue: 2
+            Chance: 10000               
+    MaxRandom: 4
+    Random:
+          - Option: VAR_HPACCELERATION
+            MinValue: 10
+            MaxValue: 50
+            Chance: 3000
+          - Option: VAR_SPACCELERATION
+            MinValue: 10
+            MaxValue: 50
+            Chance: 3000
+          - Option: ADDEXPPERCENT_KILLRACE_ALL
+            MinValue: 5
+            MaxValue: 10
+            Chance: 10000
+          # - Option: ITEMDROP_PERCENT_ALL
+          #   MinValue: 1
+          #   MaxValue: 5
+          #   Chance: 10000
+  - Id: 37 #Equipamentos de Cabeça LOW
+    Group: HEADGEAR_LOW_RANDOM_OPTIONS
+    Slots:
+      - Slot: 1
+        Options:
+          - Option: VAR_STRAMOUNT
+            MinValue: 1
+            MaxValue: 2
+            Chance: 10000
+          - Option: VAR_AGIAMOUNT
+            MinValue: 1
+            MaxValue: 2
+            Chance: 10000
+          - Option: VAR_VITAMOUNT
+            MinValue: 1
+            MaxValue: 2
+            Chance: 10000
+          - Option: VAR_INTAMOUNT
+            MinValue: 1
+            MaxValue: 2
+            Chance: 10000
+          - Option: VAR_DEXAMOUNT
+            MinValue: 1
+            MaxValue: 2
+            Chance: 10000
+          - Option: VAR_LUKAMOUNT
+            MinValue: 1
+            MaxValue: 2
+            Chance: 10000
+    MaxRandom: 4
+    Random:
+          - Option: VAR_HITSUCCESSVALUE
+            MinValue: 10
+            MaxValue: 30
+            Chance: 3000
+          - Option: VAR_HPACCELERATION
+            MinValue: 10
+            MaxValue: 50
+            Chance: 3000
+          - Option: VAR_SPACCELERATION
+            MinValue: 10
+            MaxValue: 50
+            Chance: 3000
+          # - Option: ADDZENY_KILLRACE_ALL
+          #   MinValue: 5
+          #   MaxValue: 15
+          #   Chance: 10000
+  - Id: 38 #Armadura
+    Group: ARMOR_RANDOM_OPTIONS
+    Slots:
+      - Slot: 1
+        Options:
+          - Option: VAR_VITAMOUNT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 10000
+    MaxRandom: 4
+    Random:
+          - Option: VAR_MAXHPAMOUNT
+            MinValue: 100
+            MaxValue: 500
+            Chance: 5000
+          - Option: VAR_MAXHPPERCENT
+            MinValue: 5
+            MaxValue: 10
+            Chance: 3000
+          - Option: VAR_ITEMDEFPOWER
+            MinValue: 15
+            MaxValue: 40
+            Chance: 5000
+          - Option: VAR_MDEFPOWER
+            MinValue: 15
+            MaxValue: 40
+            Chance: 5000
+  - Id: 39 #Bota
+    Group: SHOES_RANDOM_OPTIONS
+    Slots:
+      - Slot: 1
+        Options:
+          - Option: VAR_AGIAMOUNT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 10000
+    MaxRandom: 4
+    Random:
+          - Option: VAR_MAXSPAMOUNT
+            MinValue: 50
+            MaxValue: 350
+            Chance: 5000
+          - Option: VAR_MAXSPPERCENT
+            MinValue: 5
+            MaxValue: 10
+            Chance: 3000
+  - Id: 40 #Capa
+    Group: GARMENT_RANDOM_OPTIONS
+    Slots:
+      - Slot: 1
+        Options:
+          - Option: VAR_LUKAMOUNT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 10000
+    MaxRandom: 4
+    Random:
+          - Option: DEC_SPELL_CAST_TIME
+            MinValue: 5
+            MaxValue: 15
+            Chance: 3000
+          - Option: DEC_SPELL_DELAY_TIME
+            MinValue: 5
+            MaxValue: 10
+            Chance: 3000
+          - Option: VAR_PLUSASPD
+            MinValue: 1
+            MaxValue: 2
+            Chance: 3000
+          - Option: VAR_PLUSASPDPERCENT
+            MinValue: 5
+            MaxValue: 10
+            Chance: 3000
+          - Option: VAR_AVOIDSUCCESSVALUE
+            MinValue: 10
+            MaxValue: 30
+            Chance: 3000
+          - Option: VAR_HITSUCCESSVALUE
+            MinValue: 5
+            MaxValue: 5
+            Chance: 10000
+  - Id: 41 # Armas - Adagas
+    Group: DAGGER_RANDOM_OPTIONS
+    Slots:
+      - Slot: 1
+        Options:
+          - Option: VAR_STRAMOUNT
+            MinValue: 10
+            MaxValue: 10
+            Chance: 10000
+    MaxRandom: 4
+    Random:
+          - Option: DEC_SPELL_CAST_TIME
+            MinValue: 5
+            MaxValue: 15
+            Chance: 3000
+          - Option: DEC_SPELL_DELAY_TIME
+            MinValue: 5
+            MaxValue: 10
+            Chance: 3000
+          - Option: VAR_PLUSASPD
+            MinValue: 1
+            MaxValue: 5
+            Chance: 3000
+          - Option: VAR_PLUSASPDPERCENT
+            MinValue: 5
+            MaxValue: 20
+            Chance: 3000
+          - Option: VAR_AVOIDSUCCESSVALUE
+            MinValue: 10
+            MaxValue: 50
+            Chance: 3000
+          - Option: VAR_HITSUCCESSVALUE
+            MinValue: 5
+            MaxValue: 50
+            Chance: 10000
+  - Id: 42 # Espadas, Lanças, Machados
+    Group: SWORD_RANDOM_OPTIONS
+    Slots:
+      - Slot: 1
+        Options:
+          - Option: VAR_LUKAMOUNT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 10000
+    MaxRandom: 4
+    Random:
+          - Option: DEC_SPELL_CAST_TIME
+            MinValue: 5
+            MaxValue: 15
+            Chance: 3000
+          - Option: DEC_SPELL_DELAY_TIME
+            MinValue: 5
+            MaxValue: 10
+            Chance: 3000
+          - Option: VAR_PLUSASPD
+            MinValue: 1
+            MaxValue: 2
+            Chance: 3000
+          - Option: VAR_PLUSASPDPERCENT
+            MinValue: 5
+            MaxValue: 10
+            Chance: 3000
+          - Option: VAR_AVOIDSUCCESSVALUE
+            MinValue: 10
+            MaxValue: 30
+            Chance: 3000
+          - Option: VAR_HITSUCCESSVALUE
+            MinValue: 5
+            MaxValue: 5
+            Chance: 10000
+  - Id: 43 #Staff 1h e Staff 2h
+    Group: STAFF_RANDOM_OPTIONS
+    Slots:
+      - Slot: 1
+        Options:
+          - Option: MDAMAGE_PROPERTY_NOTHING_TARGET
+            MinValue: 1
+            MaxValue: 20
+            Chance: 900
+          - Option: MDAMAGE_PROPERTY_WATER_TARGET
+            MinValue: 1
+            MaxValue: 20
+            Chance: 50000
+          - Option: MDAMAGE_PROPERTY_GROUND_TARGET
+            MinValue: 1
+            MaxValue: 20
+            Chance: 50000
+          - Option: MDAMAGE_PROPERTY_FIRE_TARGET
+            MinValue: 1
+            MaxValue: 20
+            Chance: 50000
+          - Option: MDAMAGE_PROPERTY_WIND_TARGET
+            MinValue: 1
+            MaxValue: 20
+            Chance: 50000
+          - Option: MDAMAGE_PROPERTY_POISON_TARGET
+            MinValue: 1
+            MaxValue: 20
+            Chance: 50000
+          - Option: MDAMAGE_PROPERTY_SAINT_TARGET
+            MinValue: 1
+            MaxValue: 20
+            Chance: 50000
+          - Option: MDAMAGE_PROPERTY_DARKNESS_TARGET
+            MinValue: 1
+            MaxValue: 20
+            Chance: 50000
+          - Option: MDAMAGE_PROPERTY_TELEKINESIS_TARGET
+            MinValue: 1
+            MaxValue: 20
+            Chance: 50000
+          - Option: MDAMAGE_PROPERTY_UNDEAD_TARGET
+            MinValue: 1
+            MaxValue: 20
+            Chance: 50000
+          - Option: HEAL_VALUE
+            MinValue: 1
+            MaxValue: 20
+            Chance: 50000
+          - Option: VAR_MAGICATKPERCENT
+            MinValue: 1
+            MaxValue: 5
+            Chance: 50000
+          - Option: VAR_MAGICATKPERCENT
+            MinValue: 6
+            MaxValue: 10
+            Chance: 50000
+      - Slot: 2
+        Options:
+          - Option: RACE_MDAMAGE_NOTHING
+            MinValue: 1
+            MaxValue: 20
+            Chance: 500
+          - Option: RACE_MDAMAGE_UNDEAD
+            MinValue: 1
+            MaxValue: 20
+            Chance: 500
+          - Option: RACE_MDAMAGE_ANIMAL
+            MinValue: 1
+            MaxValue: 20
+            Chance: 500
+          - Option: RACE_MDAMAGE_PLANT
+            MinValue: 1
+            MaxValue: 20
+            Chance: 500
+          - Option: RACE_MDAMAGE_INSECT
+            MinValue: 1
+            MaxValue: 20
+            Chance: 500
+          - Option: RACE_MDAMAGE_FISHS
+            MinValue: 1
+            MaxValue: 20
+            Chance: 500
+          - Option: RACE_MDAMAGE_ANGEL
+            MinValue: 1
+            MaxValue: 20
+            Chance: 500
+          - Option: RACE_MDAMAGE_DRAGON
+            MinValue: 1
+            MaxValue: 20
+            Chance: 500
+          - Option: RACE_MDAMAGE_DEVIL
+            MinValue: 1
+            MaxValue: 20
+            Chance: 500
+          - Option: RACE_MDAMAGE_HUMAN
+            MinValue: 1
+            MaxValue: 20
+            Chance: 500
+          - Option: CLASS_MDAMAGE_NORMAL
+            MinValue: 1
+            MaxValue: 20
+            Chance: 500
+          - Option: CLASS_MDAMAGE_BOSS
+            MinValue: 1
+            MaxValue: 20
+            Chance: 500
+          - Option: RACE_IGNORE_MDEF_PERCENT_NOTHING
+            MinValue: 1
+            MaxValue: 30
+            Chance: 500
+          - Option: RACE_IGNORE_MDEF_PERCENT_UNDEAD
+            MinValue: 1
+            MaxValue: 30
+            Chance: 500
+          - Option: RACE_IGNORE_MDEF_PERCENT_ANIMAL
+            MinValue: 1
+            MaxValue: 30
+            Chance: 500
+          - Option: RACE_IGNORE_MDEF_PERCENT_PLANT
+            MinValue: 1
+            MaxValue: 30
+            Chance: 500
+          - Option: RACE_IGNORE_MDEF_PERCENT_INSECT
+            MinValue: 1
+            MaxValue: 30
+            Chance: 500
+          - Option: RACE_IGNORE_MDEF_PERCENT_FISHS
+            MinValue: 1
+            MaxValue: 30
+            Chance: 500
+          - Option: RACE_IGNORE_MDEF_PERCENT_ANGEL
+            MinValue: 1
+            MaxValue: 30
+            Chance: 500
+          - Option: RACE_IGNORE_MDEF_PERCENT_DRAGON
+            MinValue: 1
+            MaxValue: 30
+            Chance: 500
+          - Option: RACE_IGNORE_MDEF_PERCENT_DEVIL
+            MinValue: 1
+            MaxValue: 30
+            Chance: 400
+          - Option: RACE_IGNORE_MDEF_PERCENT_HUMAN
+            MinValue: 1
+            MaxValue: 30
+            Chance: 400
+          - Option: CLASS_IGNORE_MDEF_PERCENT_NORMAL
+            MinValue: 1
+            MaxValue: 30
+            Chance: 100
+          - Option: CLASS_IGNORE_MDEF_PERCENT_BOSS
+            MinValue: 1
+            MaxValue: 30
+            Chance: 100
+      - Slot: 3
+        Options:
+          - Option: VAR_INTAMOUNT
+            MinValue: 1
+            MaxValue: 10
+            Chance: 2500
+          - Option: VAR_DEXAMOUNT
+            MinValue: 1
+            MaxValue: 10
+            Chance: 2500
+          - Option: VAR_ATTMPOWER
+            MinValue: 10
+            MaxValue: 50
+            Chance: 2000
+          - Option: DEC_SPELL_CAST_TIME
+            MinValue: 1
+            MaxValue: 15
+            Chance: 50000
+          - Option: DEC_SPELL_DELAY_TIME
+            MinValue: 1
+            MaxValue: 10
+            Chance: 50000
+          - Option: DEC_SP_CONSUMPTION
+            MinValue: 1
+            MaxValue: 5
+            Chance: 50000
+          - Option: DEC_SPELL_CAST_TIME
+            MinValue: 16
+            MaxValue: 20
+            Chance: 100
+          - Option: DEC_SPELL_DELAY_TIME
+            MinValue: 11
+            MaxValue: 15
+            Chance: 100
+          - Option: DEC_SP_CONSUMPTION
+            MinValue: 6
+            MaxValue: 10
+            Chance: 100

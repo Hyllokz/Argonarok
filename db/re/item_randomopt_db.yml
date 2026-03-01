@@ -1029,3 +1029,11 @@ Body:
     Option: VAR_CRITICAL_RATE
     Script: |
       bonus bCRate,getrandomoptinfo(ROA_VALUE);
+  # - Id: 255
+  #   Option: ADDZENY_KILLRACE_ALL
+  #   Script: |
+  #     bonus2 bZenyAddRace,RC_All,getrandomoptinfo(ROA_VALUE);
+  # - Id: 256
+  #   Option: ITEMDROP_PERCENT_ALL
+  #   Script: |
+  #     bonus bItemDroprate,getrandomoptinfo(ROA_VALUE);
