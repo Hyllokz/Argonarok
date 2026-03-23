@@ -9979,6 +9979,10 @@ static const struct _battle_data {
 #else
 	{ "feature.instance_allow_reconnect",   &battle_config.instance_allow_reconnect,        0,      0,      1,              },
 #endif
+	// [RomuloSM]: Pet Random Option
+	{ "pet_random_full_loyalty",            &battle_config.pet_random_full_loyalty,                   2028,      0,      INT_MAX,       },
+	{ "pet_random_not_hungry",              &battle_config.pet_random_not_hungry,                     2029,      0,      INT_MAX,       },
+	{ "pet_random_full_loyalty_not_hungry", &battle_config.pet_random_full_loyalty_not_hungry,        2030,      0,      INT_MAX,       },
 	{ "synchronize_damage",                 &battle_config.synchronize_damage,              0,      0,      1,              },
 	{ "item_stacking",                      &battle_config.item_stacking,                   1,      0,      1,              },
 #ifdef RENEWAL

@@ -2766,6 +2766,17 @@ static void clif_addcards( struct EQUIPSLOTINFO* buf, const item* item ){
 
 	// Pet eggs
 	if( item->card[0] == CARD0_PET ){
+		// [RomuloSM]: Pet Random Option
+		int i;
+		ARR_FIND(0, MAX_ITEM_RDM_OPT, i, item->option[i].id != 0);
+		if( i < MAX_ITEM_RDM_OPT ) {
+			buf->card[0] = 0;
+			buf->card[1] = 0;
+			buf->card[2] = 0;
+			buf->card[3] = 0;
+			return;
+		}
+
 		buf->card[0] = 0;
 		buf->card[1] = 0;
 		// Pet intimacy
@@ -10336,8 +10347,14 @@ void clif_viewequip_ack( const map_session_data& sd, const map_session_data& tsd
 #endif
 	p->headpalette = tsd.vd.look[LOOK_HAIR_COLOR];
 	p->bodypalette = tsd.vd.look[LOOK_CLOTHES_COLOR];
-#if PACKETVER_MAIN_NUM >= 20180801 || PACKETVER_RE_NUM >= 20180801 || PACKETVER_ZERO_NUM >= 20180808
+#if PACKETVER >= 20231220 && !defined(PACKETVER_ZERO)
 	p->body2 = tsd.vd.look[LOOK_BODY2];
+#elif PACKETVER_MAIN_NUM >= 20180801 || PACKETVER_RE_NUM >= 20180801 || PACKETVER_ZERO_NUM >= 20180808
+	if( tsd.vd.look[LOOK_BODY2] > JOB_SECOND_JOB_START && tsd.vd.look[LOOK_BODY2] < JOB_SECOND_JOB_END ){
+		p->body2 = 1;
+	}else{
+		p->body2 = 0;
+	}
 #endif
 	p->sex = tsd.vd.sex;
 
@@ -11619,13 +11636,18 @@ void clif_parse_Emotion(int32 fd, map_session_data *sd){
 		return;
 	}
 
-	const PACKET_CZ_REQ_EMOTION* p = reinterpret_cast<PACKET_CZ_REQ_EMOTION*>( RFIFOP( fd, 0 ) );
+	//const PACKET_CZ_REQ_EMOTION* p = reinterpret_cast<PACKET_CZ_REQ_EMOTION*>( RFIFOP( fd, 0 ) );
+	#if PACKETVER_MAIN_NUM >= 20230705
+	emotion_type emoticon = static_cast<emotion_type>(RFIFOB(fd, packet_db[RFIFOW(fd, 0)].pos[0]));
+	#else
+	const PACKET_CZ_REQ_EMOTION* p = reinterpret_cast<PACKET_CZ_REQ_EMOTION*>(RFIFOP(fd, 0));
 
 	if( p->emotion_type >= ET_MAX ){
 		return;
 	}
 	
 	emotion_type emoticon = static_cast<emotion_type>( p->emotion_type );
+	#endif
 
 	if (battle_config.basic_skill_check == 0 || pc_checkskill(sd, NV_BASIC) >= 2 || pc_checkskill(sd, SU_BASIC_SKILL) >= 1) {
 		if (emoticon == ET_CHAT_PROHIBIT) {// prevent use of the mute emote [Valaris]

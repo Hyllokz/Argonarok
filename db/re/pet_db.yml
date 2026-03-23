@@ -100,6 +100,8 @@ Body:
          bonus bBaseAtk,3;
          bonus bHit,3;
       }
+      bonus3 bAutoSpell,"BS_ADRENALINE",1,100;
+      skill "AL_HEAL",10;
     Evolution:
       - Target: DR_EGGRING
         ItemRequirements:

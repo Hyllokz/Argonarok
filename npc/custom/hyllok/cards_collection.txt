@@ -1,0 +1,916 @@
+// SQL Tables
+/*
+DROP TABLE IF EXISTS collection_db;
+DROP TABLE IF EXISTS collection_cards;
+DROP TABLE IF EXISTS account_collection_progress;
+DROP TABLE IF EXISTS account_collection_complete;
+DROP TABLE IF EXISTS collection_bonus;
+
+DROP TABLE IF EXISTS bonus_categories;
+DROP TABLE IF EXISTS bonus_list;
+DROP TABLE IF EXISTS bonus_constants;
+
+CREATE TABLE collection_db (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ name VARCHAR(100),
+ region VARCHAR(100),
+ active TINYINT DEFAULT 1
+);
+
+CREATE TABLE collection_cards (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ collection_id INT,
+ item_id INT
+);
+
+CREATE TABLE account_collection_progress (
+ account_id INT,
+ collection_id INT,
+ item_id INT,
+ PRIMARY KEY(account_id,collection_id,item_id)
+);
+
+CREATE TABLE account_collection_complete (
+ account_id INT,
+ collection_id INT,
+ PRIMARY KEY(account_id,collection_id)
+);
+
+CREATE TABLE collection_bonus (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ collection_id INT,
+ script TEXT
+);
+
+CREATE TABLE bonus_categories (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ name VARCHAR(100)
+);
+
+CREATE TABLE bonus_list (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ category_id INT,
+ script_cmd VARCHAR(10),
+ bonus_cmd VARCHAR(50),
+ param1_type VARCHAR(30),
+ param2_type VARCHAR(30),
+ param3_type VARCHAR(30),
+ param4_type VARCHAR(30),
+ param5_type VARCHAR(30),
+ description TEXT
+);
+
+CREATE TABLE bonus_constants (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ type VARCHAR(30),
+ value VARCHAR(100)
+);
+*/
+// SQL Inserts
+/*
+INSERT INTO bonus_list VALUES
+(NULL,1,'bonus','bStr','number',NULL,NULL,NULL,NULL,'Increase STR'),
+(NULL,1,'bonus','bAgi','number',NULL,NULL,NULL,NULL,'Increase AGI'),
+(NULL,1,'bonus','bVit','number',NULL,NULL,NULL,NULL,'Increase VIT'),
+(NULL,1,'bonus','bInt','number',NULL,NULL,NULL,NULL,'Increase INT'),
+(NULL,1,'bonus','bDex','number',NULL,NULL,NULL,NULL,'Increase DEX'),
+(NULL,1,'bonus','bLuk','number',NULL,NULL,NULL,NULL,'Increase LUK'),
+(NULL,1,'bonus','bAllStats','number',NULL,NULL,NULL,NULL,'Increase all stats'),
+(NULL,1,'bonus','bAgiVit','number',NULL,NULL,NULL,NULL,'Increase AGI and VIT'),
+(NULL,1,'bonus','bAgiDexStr','number',NULL,NULL,NULL,NULL,'Increase STR AGI DEX'),
+
+(NULL,1,'bonus','bPow','number',NULL,NULL,NULL,NULL,'Increase POW'),
+(NULL,1,'bonus','bSta','number',NULL,NULL,NULL,NULL,'Increase STA'),
+(NULL,1,'bonus','bWis','number',NULL,NULL,NULL,NULL,'Increase WIS'),
+(NULL,1,'bonus','bSpl','number',NULL,NULL,NULL,NULL,'Increase SPL'),
+(NULL,1,'bonus','bCon','number',NULL,NULL,NULL,NULL,'Increase CON'),
+(NULL,1,'bonus','bCrt','number',NULL,NULL,NULL,NULL,'Increase CRT'),
+(NULL,1,'bonus','bAllTraitStats','number',NULL,NULL,NULL,NULL,'Increase all trait stats'),
+
+(NULL,1,'bonus','bMaxHP','number',NULL,NULL,NULL,NULL,'Max HP'),
+(NULL,1,'bonus','bMaxHPrate','number',NULL,NULL,NULL,NULL,'Max HP percent'),
+(NULL,1,'bonus','bMaxSP','number',NULL,NULL,NULL,NULL,'Max SP'),
+(NULL,1,'bonus','bMaxSPrate','number',NULL,NULL,NULL,NULL,'Max SP percent'),
+(NULL,1,'bonus','bMaxAP','number',NULL,NULL,NULL,NULL,'Max AP'),
+(NULL,1,'bonus','bMaxAPrate','number',NULL,NULL,NULL,NULL,'Max AP percent'),
+
+(NULL,1,'bonus','bBaseAtk','number',NULL,NULL,NULL,NULL,'Base ATK'),
+(NULL,1,'bonus','bAtk','number',NULL,NULL,NULL,NULL,'ATK'),
+(NULL,1,'bonus','bAtk2','number',NULL,NULL,NULL,NULL,'ATK2'),
+(NULL,1,'bonus','bAtkRate','number',NULL,NULL,NULL,NULL,'ATK percent'),
+(NULL,1,'bonus','bWeaponAtkRate','number',NULL,NULL,NULL,NULL,'Weapon ATK percent'),
+
+(NULL,1,'bonus','bMatk','number',NULL,NULL,NULL,NULL,'MATK'),
+(NULL,1,'bonus','bMatk2','number',NULL,NULL,NULL,NULL,'MATK hidden'),
+(NULL,1,'bonus','bMatkRate','number',NULL,NULL,NULL,NULL,'MATK percent'),
+(NULL,1,'bonus','bWeaponMatkRate','number',NULL,NULL,NULL,NULL,'Weapon MATK percent'),
+
+(NULL,1,'bonus','bDef','number',NULL,NULL,NULL,NULL,'DEF'),
+(NULL,1,'bonus','bDefRate','number',NULL,NULL,NULL,NULL,'DEF percent'),
+(NULL,1,'bonus','bDef2','number',NULL,NULL,NULL,NULL,'VIT DEF'),
+(NULL,1,'bonus','bDef2Rate','number',NULL,NULL,NULL,NULL,'VIT DEF percent'),
+
+(NULL,1,'bonus','bMdef','number',NULL,NULL,NULL,NULL,'MDEF'),
+(NULL,1,'bonus','bMdefRate','number',NULL,NULL,NULL,NULL,'MDEF percent'),
+(NULL,1,'bonus','bMdef2','number',NULL,NULL,NULL,NULL,'INT MDEF'),
+(NULL,1,'bonus','bMdef2Rate','number',NULL,NULL,NULL,NULL,'INT MDEF percent'),
+
+(NULL,1,'bonus','bHit','number',NULL,NULL,NULL,NULL,'Hit'),
+(NULL,1,'bonus','bHitRate','number',NULL,NULL,NULL,NULL,'Hit percent'),
+
+(NULL,1,'bonus','bCritical','number',NULL,NULL,NULL,NULL,'Critical'),
+(NULL,1,'bonus','bCriticalLong','number',NULL,NULL,NULL,NULL,'Long critical'),
+(NULL,3,'bonus2','bCriticalAddRace','race','number',NULL,NULL,NULL,'Critical vs race'),
+
+(NULL,1,'bonus','bCriticalRate','number',NULL,NULL,NULL,NULL,'Critical percent'),
+
+(NULL,1,'bonus','bFlee','number',NULL,NULL,NULL,NULL,'Flee'),
+(NULL,1,'bonus','bFleeRate','number',NULL,NULL,NULL,NULL,'Flee percent'),
+
+(NULL,1,'bonus','bFlee2','number',NULL,NULL,NULL,NULL,'Perfect dodge'),
+(NULL,1,'bonus','bFlee2Rate','number',NULL,NULL,NULL,NULL,'Perfect dodge percent'),
+
+(NULL,1,'bonus','bPerfectHitRate','number',NULL,NULL,NULL,NULL,'Perfect hit chance'),
+(NULL,1,'bonus','bPerfectHitAddRate','number',NULL,NULL,NULL,NULL,'Perfect hit bonus'),
+
+(NULL,1,'bonus','bSpeedRate','number',NULL,NULL,NULL,NULL,'Movement speed'),
+(NULL,1,'bonus','bSpeedAddRate','number',NULL,NULL,NULL,NULL,'Movement speed bonus'),
+
+(NULL,1,'bonus','bAspd','number',NULL,NULL,NULL,NULL,'ASPD'),
+(NULL,1,'bonus','bAspdRate','number',NULL,NULL,NULL,NULL,'ASPD percent'),
+
+(NULL,1,'bonus','bAtkRange','number',NULL,NULL,NULL,NULL,'Attack range'),
+(NULL,1,'bonus','bAddMaxWeight','number',NULL,NULL,NULL,NULL,'Max weight'),
+
+(NULL,1,'bonus','bPAtk','number',NULL,NULL,NULL,NULL,'PAtk'),
+(NULL,1,'bonus','bPAtkRate','number',NULL,NULL,NULL,NULL,'PAtk percent'),
+
+(NULL,1,'bonus','bSMatk','number',NULL,NULL,NULL,NULL,'SMAtk'),
+(NULL,1,'bonus','bSMatkRate','number',NULL,NULL,NULL,NULL,'SMAtk percent'),
+
+(NULL,1,'bonus','bRes','number',NULL,NULL,NULL,NULL,'Res'),
+(NULL,1,'bonus','bResRate','number',NULL,NULL,NULL,NULL,'Res percent'),
+
+(NULL,1,'bonus','bMRes','number',NULL,NULL,NULL,NULL,'MRes'),
+(NULL,1,'bonus','bMResRate','number',NULL,NULL,NULL,NULL,'MRes percent'),
+
+(NULL,1,'bonus','bHPlus','number',NULL,NULL,NULL,NULL,'HPlus'),
+(NULL,1,'bonus','bHPlusRate','number',NULL,NULL,NULL,NULL,'HPlus percent'),
+
+(NULL,1,'bonus','bCRate','number',NULL,NULL,NULL,NULL,'CRate'),
+(NULL,1,'bonus','bCRateRate','number',NULL,NULL,NULL,NULL,'CRate percent');
+
+INSERT INTO bonus_list VALUES
+(NULL,2,'bonus','bHPrecovRate','number',NULL,NULL,NULL,NULL,'HP regen rate'),
+(NULL,2,'bonus','bSPrecovRate','number',NULL,NULL,NULL,NULL,'SP regen rate'),
+
+(NULL,2,'bonus2','bHPRegenRate','number','time',NULL,NULL,NULL,'HP regen interval'),
+(NULL,2,'bonus2','bHPLossRate','number','time',NULL,NULL,NULL,'HP loss interval'),
+
+(NULL,2,'bonus2','bSPRegenRate','number','time',NULL,NULL,NULL,'SP regen interval'),
+(NULL,2,'bonus2','bSPLossRate','number','time',NULL,NULL,NULL,'SP loss interval'),
+
+(NULL,2,'bonus2','bRegenPercentHP','number','time',NULL,NULL,NULL,'HP percent regen'),
+(NULL,2,'bonus2','bRegenPercentSP','number','time',NULL,NULL,NULL,'SP percent regen'),
+
+(NULL,2,'bonus','bNoRegen','number',NULL,NULL,NULL,NULL,'Disable regen'),
+
+(NULL,2,'bonus','bUseSPrate','number',NULL,NULL,NULL,NULL,'SP consumption'),
+
+(NULL,2,'bonus2','bSkillUseSP','skill','number',NULL,NULL,NULL,'Reduce skill SP'),
+(NULL,2,'bonus2','bSkillUseSPrate','skill','number',NULL,NULL,NULL,'Reduce skill SP percent'),
+
+(NULL,2,'bonus2','bSkillAtk','skill','number',NULL,NULL,NULL,'Skill damage percent'),
+
+(NULL,2,'bonus','bSkillRatio','number',NULL,NULL,NULL,NULL,'Skill ratio'),
+
+(NULL,2,'bonus','bShortAtkRate','number',NULL,NULL,NULL,NULL,'Short range damage'),
+(NULL,2,'bonus','bLongAtkRate','number',NULL,NULL,NULL,NULL,'Long range damage'),
+
+(NULL,2,'bonus','bCritAtkRate','number',NULL,NULL,NULL,NULL,'Critical damage'),
+
+(NULL,2,'bonus','bNonCritAtkRate','number',NULL,NULL,NULL,NULL,'Non critical damage'),
+
+(NULL,2,'bonus','bCritDefRate','number',NULL,NULL,NULL,NULL,'Critical damage reduction'),
+
+(NULL,2,'bonus','bCriticalDef','number',NULL,NULL,NULL,NULL,'Critical resist'),
+
+(NULL,2,'bonus2','bWeaponAtk','weapon','number',NULL,NULL,NULL,'Weapon atk'),
+
+(NULL,2,'bonus2','bWeaponDamageRate','weapon','number',NULL,NULL,NULL,'Weapon damage'),
+
+(NULL,2,'bonus','bNearAtkDef','number',NULL,NULL,NULL,NULL,'Melee reduction'),
+(NULL,2,'bonus','bLongAtkDef','number',NULL,NULL,NULL,NULL,'Ranged reduction'),
+(NULL,2,'bonus','bMagicAtkDef','number',NULL,NULL,NULL,NULL,'Magic reduction'),
+(NULL,2,'bonus','bMiscAtkDef','number',NULL,NULL,NULL,NULL,'Misc reduction'),
+
+(NULL,2,'bonus','bNoWeaponDamage','number',NULL,NULL,NULL,NULL,'Weapon damage reduction'),
+(NULL,2,'bonus','bNoMagicDamage','number',NULL,NULL,NULL,NULL,'Magic damage reduction'),
+(NULL,2,'bonus','bNoMiscDamage','number',NULL,NULL,NULL,NULL,'Misc damage reduction');
+
+INSERT INTO bonus_list VALUES
+(NULL,3,'bonus2','bAddEle','element','number',NULL,NULL,NULL,'Physical damage vs element'),
+(NULL,3,'bonus3','bAddEle','element','number','bf',NULL,NULL,'Physical damage vs element with trigger'),
+
+(NULL,3,'bonus2','bMagicAddEle','element','number',NULL,NULL,NULL,'Magic damage vs element'),
+
+(NULL,3,'bonus2','bSubEle','element','number',NULL,NULL,NULL,'Damage reduction vs element'),
+(NULL,3,'bonus3','bSubEle','element','number','bf',NULL,NULL,'Damage reduction vs element with trigger'),
+
+(NULL,3,'bonus2','bSubDefEle','element','number',NULL,NULL,NULL,'Damage reduction vs defense element'),
+(NULL,3,'bonus2','bMagicSubDefEle','element','number',NULL,NULL,NULL,'Magic reduction vs defense element'),
+
+(NULL,3,'bonus2','bAddRace','race','number',NULL,NULL,NULL,'Damage vs race'),
+(NULL,3,'bonus2','bMagicAddRace','race','number',NULL,NULL,NULL,'Magic damage vs race'),
+
+(NULL,3,'bonus2','bSubRace','race','number',NULL,NULL,NULL,'Damage reduction vs race'),
+(NULL,3,'bonus3','bSubRace','race','number','bf',NULL,NULL,'Damage reduction vs race with trigger'),
+
+(NULL,3,'bonus2','bAddClass','class','number',NULL,NULL,NULL,'Damage vs class'),
+(NULL,3,'bonus2','bMagicAddClass','class','number',NULL,NULL,NULL,'Magic damage vs class'),
+(NULL,3,'bonus2','bSubClass','class','number',NULL,NULL,NULL,'Damage reduction vs class'),
+
+(NULL,3,'bonus2','bAddSize','size','number',NULL,NULL,NULL,'Damage vs size'),
+(NULL,3,'bonus2','bMagicAddSize','size','number',NULL,NULL,NULL,'Magic damage vs size'),
+
+(NULL,3,'bonus2','bSubSize','size','number',NULL,NULL,NULL,'Damage reduction vs size'),
+(NULL,3,'bonus2','bWeaponSubSize','size','number',NULL,NULL,NULL,'Weapon damage reduction vs size'),
+(NULL,3,'bonus2','bMagicSubSize','size','number',NULL,NULL,NULL,'Magic damage reduction vs size'),
+
+(NULL,3,'bonus','bNoSizeFix',NULL,NULL,NULL,NULL,NULL,'Ignore size modifier'),
+
+(NULL,3,'bonus2','bAddDamageClass','mob','number',NULL,NULL,NULL,'Damage vs monster ID'),
+(NULL,3,'bonus2','bAddMagicDamageClass','mob','number',NULL,NULL,NULL,'Magic damage vs monster ID'),
+
+(NULL,3,'bonus2','bAddDefMonster','mob','number',NULL,NULL,NULL,'Physical reduction vs monster ID'),
+(NULL,3,'bonus2','bAddMDefMonster','mob','number',NULL,NULL,NULL,'Magic reduction vs monster ID'),
+
+(NULL,3,'bonus2','bAddRace2','race2','number',NULL,NULL,NULL,'Damage vs monster race'),
+(NULL,3,'bonus2','bSubRace2','race2','number',NULL,NULL,NULL,'Damage reduction vs monster race'),
+(NULL,3,'bonus2','bMagicAddRace2','race2','number',NULL,NULL,NULL,'Magic damage vs monster race'),
+
+(NULL,3,'bonus2','bSubSkill','skill','number',NULL,NULL,NULL,'Damage reduction vs skill'),
+
+(NULL,3,'bonus','bAbsorbDmgMaxHP','number',NULL,NULL,NULL,NULL,'Limit damage by percent of MaxHP'),
+(NULL,3,'bonus','bAbsorbDmgMaxHP2','number',NULL,NULL,NULL,NULL,'Damage capped to percent MaxHP'),
+
+(NULL,3,'bonus','bAtkEle','element',NULL,NULL,NULL,NULL,'Change attack element'),
+(NULL,3,'bonus','bDefEle','element',NULL,NULL,NULL,NULL,'Change defense element'),
+
+(NULL,3,'bonus2','bMagicAtkEle','element','number',NULL,NULL,NULL,'Magic damage of element'),
+
+(NULL,3,'bonus','bDefRatioAtkRace','race',NULL,NULL,NULL,NULL,'Damage vs race based on DEF'),
+(NULL,3,'bonus','bDefRatioAtkEle','element',NULL,NULL,NULL,NULL,'Damage vs element based on DEF'),
+(NULL,3,'bonus','bDefRatioAtkClass','class',NULL,NULL,NULL,NULL,'Damage vs class based on DEF'),
+
+(NULL,3,'bonus4','bSetDefRace','race','number','time','number',NULL,'Set enemy DEF'),
+(NULL,3,'bonus4','bSetMDefRace','race','number','time','number',NULL,'Set enemy MDEF'),
+
+(NULL,3,'bonus','bIgnoreDefEle','element',NULL,NULL,NULL,NULL,'Ignore DEF vs element'),
+(NULL,3,'bonus','bIgnoreDefRace','race',NULL,NULL,NULL,NULL,'Ignore DEF vs race'),
+(NULL,3,'bonus','bIgnoreDefClass','class',NULL,NULL,NULL,NULL,'Ignore DEF vs class'),
+
+(NULL,3,'bonus','bIgnoreMDefRace','race',NULL,NULL,NULL,NULL,'Ignore MDEF vs race'),
+
+(NULL,3,'bonus2','bIgnoreDefRaceRate','race','number',NULL,NULL,NULL,'Ignore percent DEF vs race'),
+(NULL,3,'bonus2','bIgnoreMdefRaceRate','race','number',NULL,NULL,NULL,'Ignore percent MDEF vs race'),
+
+(NULL,3,'bonus2','bIgnoreMdefRace2Rate','race2','number',NULL,NULL,NULL,'Ignore percent MDEF vs monster race'),
+
+(NULL,3,'bonus','bIgnoreMDefEle','element',NULL,NULL,NULL,NULL,'Ignore MDEF vs element'),
+
+(NULL,3,'bonus2','bIgnoreDefClassRate','class','number',NULL,NULL,NULL,'Ignore percent DEF vs class'),
+(NULL,3,'bonus2','bIgnoreMdefClassRate','class','number',NULL,NULL,NULL,'Ignore percent MDEF vs class'),
+
+(NULL,3,'bonus2','bIgnoreResRaceRate','race','number',NULL,NULL,NULL,'Ignore percent Res vs race'),
+(NULL,3,'bonus2','bIgnoreMResRaceRate','race','number',NULL,NULL,NULL,'Ignore percent MRes vs race'),
+
+(NULL,3,'bonus2','bExpAddRace','race','number',NULL,NULL,NULL,'Extra EXP vs race'),
+(NULL,3,'bonus2','bExpAddClass','class','number',NULL,NULL,NULL,'Extra EXP vs class');
+
+INSERT INTO bonus_list VALUES
+(NULL,4,'bonus2','bAddEff','status','number',NULL,NULL,NULL,'Inflict status'),
+(NULL,4,'bonus2','bAddEff2','status','number',NULL,NULL,NULL,'Inflict status on self'),
+(NULL,4,'bonus2','bAddEffWhenHit','status','number',NULL,NULL,NULL,'Inflict status when hit'),
+
+(NULL,4,'bonus2','bResEff','status','number',NULL,NULL,NULL,'Status resistance'),
+
+(NULL,4,'bonus3','bAddEff','status','number','atf',NULL,NULL,'Inflict status with trigger'),
+
+(NULL,4,'bonus4','bAddEff','status','number','atf','time',NULL,'Inflict status duration'),
+
+(NULL,4,'bonus3','bAddEffWhenHit','status','number','atf',NULL,NULL,'Status when hit'),
+
+(NULL,4,'bonus4','bAddEffWhenHit','status','number','atf','time',NULL,'Status when hit duration'),
+
+(NULL,4,'bonus3','bAddEffOnSkill','skill','status','number',NULL,NULL,'Status on skill'),
+
+(NULL,4,'bonus4','bAddEffOnSkill','skill','status','number','atf',NULL,'Status on skill with trigger'),
+
+(NULL,4,'bonus5','bAddEffOnSkill','skill','status','number','atf','time','Status on skill duration'),
+
+(NULL,4,'bonus2','bComaClass','class','number',NULL,NULL,NULL,'Coma vs class'),
+(NULL,4,'bonus2','bComaRace','race','number',NULL,NULL,NULL,'Coma vs race'),
+
+(NULL,4,'bonus2','bWeaponComaEle','element','number',NULL,NULL,NULL,'Coma vs element'),
+
+(NULL,4,'bonus2','bWeaponComaClass','class','number',NULL,NULL,NULL,'Coma vs class'),
+
+(NULL,4,'bonus2','bWeaponComaRace','race','number',NULL,NULL,NULL,'Coma vs race');
+
+INSERT INTO bonus_list VALUES
+(NULL,5,'bonus3','bAutoSpell','skill','number','number',NULL,NULL,'Auto cast skill'),
+
+(NULL,5,'bonus3','bAutoSpellWhenHit','skill','number','number',NULL,NULL,'Auto cast when hit'),
+
+(NULL,5,'bonus4','bAutoSpell','skill','number','number','number',NULL,'Auto cast skill advanced'),
+
+(NULL,5,'bonus5','bAutoSpell','skill','number','number','bf','number','Auto cast skill with trigger'),
+
+(NULL,5,'bonus4','bAutoSpellWhenHit','skill','number','number','number',NULL,'Auto cast when hit advanced'),
+
+(NULL,5,'bonus5','bAutoSpellWhenHit','skill','number','number','bf','number','Auto cast when hit trigger'),
+
+(NULL,5,'bonus4','bAutoSpellOnSkill','skill','skill','number','number',NULL,'Auto spell on skill'),
+
+(NULL,5,'bonus5','bAutoSpellOnSkill','skill','skill','number','number','number','Auto spell on skill advanced');
+
+INSERT INTO bonus_list VALUES
+(NULL,6,'bonus','bHPDrainValue','number',NULL,NULL,NULL,NULL,'HP drain'),
+(NULL,6,'bonus2','bHPDrainValueRace','race','number',NULL,NULL,NULL,'HP drain vs race'),
+(NULL,6,'bonus2','bHpDrainValueClass','class','number',NULL,NULL,NULL,'HP drain vs class'),
+
+(NULL,6,'bonus','bSPDrainValue','number',NULL,NULL,NULL,NULL,'SP drain'),
+(NULL,6,'bonus2','bSPDrainValueRace','race','number',NULL,NULL,NULL,'SP drain vs race'),
+(NULL,6,'bonus2','bSpDrainValueClass','class','number',NULL,NULL,NULL,'SP drain vs class'),
+
+(NULL,6,'bonus2','bHPDrainRate','number','number',NULL,NULL,NULL,'HP drain rate'),
+(NULL,6,'bonus2','bSPDrainRate','number','number',NULL,NULL,NULL,'SP drain rate'),
+
+(NULL,6,'bonus2','bHPVanishRate','number','number',NULL,NULL,NULL,'HP vanish'),
+(NULL,6,'bonus3','bHPVanishRaceRate','race','number','number',NULL,NULL,'HP vanish vs race'),
+
+(NULL,6,'bonus2','bSPVanishRate','number','number',NULL,NULL,NULL,'SP vanish'),
+
+(NULL,6,'bonus3','bSPVanishRaceRate','race','number','number',NULL,NULL,'SP vanish vs race'),
+
+(NULL,6,'bonus3','bStateNoRecoverRace','race','number','time',NULL,NULL,'No recover state'),
+
+(NULL,6,'bonus','bHPGainValue','number',NULL,NULL,NULL,NULL,'HP gain'),
+(NULL,6,'bonus','bSPGainValue','number',NULL,NULL,NULL,NULL,'SP gain'),
+
+(NULL,6,'bonus2','bSPGainRace','race','number',NULL,NULL,NULL,'SP gain vs race'),
+
+(NULL,6,'bonus','bLongHPGainValue','number',NULL,NULL,NULL,NULL,'HP gain ranged'),
+(NULL,6,'bonus','bLongSPGainValue','number',NULL,NULL,NULL,NULL,'SP gain ranged'),
+
+(NULL,6,'bonus','bMagicHPGainValue','number',NULL,NULL,NULL,NULL,'HP gain magic'),
+(NULL,6,'bonus','bMagicSPGainValue','number',NULL,NULL,NULL,NULL,'SP gain magic'),
+
+(NULL,6,'bonus','bShortWeaponDamageReturn','number',NULL,NULL,NULL,NULL,'Reflect melee'),
+(NULL,6,'bonus','bLongWeaponDamageReturn','number',NULL,NULL,NULL,NULL,'Reflect ranged'),
+(NULL,6,'bonus','bMagicDamageReturn','number',NULL,NULL,NULL,NULL,'Reflect magic'),
+
+(NULL,6,'bonus','bReduceDamageReturn','number',NULL,NULL,NULL,NULL,'Reduce reflect'),
+
+(NULL,6,'bonus','bUnstripableWeapon',NULL,NULL,NULL,NULL,NULL,'Unstrip weapon'),
+(NULL,6,'bonus','bUnstripableArmor',NULL,NULL,NULL,NULL,NULL,'Unstrip armor'),
+(NULL,6,'bonus','bUnstripableHelm',NULL,NULL,NULL,NULL,NULL,'Unstrip helm'),
+(NULL,6,'bonus','bUnstripableShield',NULL,NULL,NULL,NULL,NULL,'Unstrip shield'),
+(NULL,6,'bonus','bUnstripable',NULL,NULL,NULL,NULL,NULL,'Unstrip all'),
+
+(NULL,6,'bonus','bUnbreakableGarment',NULL,NULL,NULL,NULL,NULL,'Unbreak garment'),
+(NULL,6,'bonus','bUnbreakableWeapon',NULL,NULL,NULL,NULL,NULL,'Unbreak weapon'),
+(NULL,6,'bonus','bUnbreakableArmor',NULL,NULL,NULL,NULL,NULL,'Unbreak armor'),
+(NULL,6,'bonus','bUnbreakableHelm',NULL,NULL,NULL,NULL,NULL,'Unbreak helm'),
+(NULL,6,'bonus','bUnbreakableShield',NULL,NULL,NULL,NULL,NULL,'Unbreak shield'),
+(NULL,6,'bonus','bUnbreakableShoes',NULL,NULL,NULL,NULL,NULL,'Unbreak shoes'),
+
+(NULL,6,'bonus','bUnbreakable','number',NULL,NULL,NULL,NULL,'Reduce break chance'),
+
+(NULL,6,'bonus','bBreakWeaponRate','number',NULL,NULL,NULL,NULL,'Break weapon'),
+(NULL,6,'bonus','bBreakArmorRate','number',NULL,NULL,NULL,NULL,'Break armor'),
+
+(NULL,6,'bonus2','bDropAddRace','race','number',NULL,NULL,NULL,'Drop rate vs race'),
+(NULL,6,'bonus2','bDropAddClass','class','number',NULL,NULL,NULL,'Drop rate vs class'),
+
+(NULL,6,'bonus3','bAddMonsterIdDropItem','item','mob','number',NULL,NULL,'Extra drop'),
+
+(NULL,6,'bonus2','bAddMonsterDropItem','item','number',NULL,NULL,NULL,'Drop item'),
+
+(NULL,6,'bonus3','bAddMonsterDropItem','item','race','number',NULL,NULL,'Drop item vs race'),
+
+(NULL,6,'bonus3','bAddClassDropItem','item','class','number',NULL,NULL,'Drop item vs class'),
+
+(NULL,6,'bonus2','bAddMonsterDropItemGroup','itemgroup','number',NULL,NULL,NULL,'Drop item group'),
+
+(NULL,6,'bonus3','bAddMonsterDropItemGroup','itemgroup','race','number',NULL,NULL,'Drop group vs race'),
+
+(NULL,6,'bonus3','bAddClassDropItemGroup','itemgroup','class','number',NULL,NULL,'Drop group vs class'),
+
+(NULL,6,'bonus2','bGetZenyNum','number','number',NULL,NULL,NULL,'Gain zeny'),
+
+(NULL,6,'bonus2','bAddGetZenyNum','number','number',NULL,NULL,NULL,'Extra zeny'),
+
+(NULL,6,'bonus','bDoubleRate','number',NULL,NULL,NULL,NULL,'Double attack'),
+
+(NULL,6,'bonus','bDoubleAddRate','number',NULL,NULL,NULL,NULL,'Double attack bonus'),
+
+(NULL,6,'bonus','bSplashRange','number',NULL,NULL,NULL,NULL,'Splash radius'),
+
+(NULL,6,'bonus','bSplashAddRange','number',NULL,NULL,NULL,NULL,'Splash radius bonus'),
+
+(NULL,6,'bonus2','bAddSkillBlow','skill','number',NULL,NULL,NULL,'Knockback skill'),
+
+(NULL,6,'bonus','bNoKnockback',NULL,NULL,NULL,NULL,NULL,'Prevent knockback'),
+
+(NULL,6,'bonus','bNoGemStone',NULL,NULL,NULL,NULL,NULL,'No gemstone'),
+
+(NULL,6,'bonus','bIntravision',NULL,NULL,NULL,NULL,NULL,'See hidden'),
+
+(NULL,6,'bonus','bPerfectHide',NULL,NULL,NULL,NULL,NULL,'Hide from monsters'),
+
+(NULL,6,'bonus','bRestartFullRecover',NULL,NULL,NULL,NULL,NULL,'Full recover on revive'),
+
+(NULL,6,'bonus','bClassChange','number',NULL,NULL,NULL,NULL,'Change monster class'),
+
+(NULL,6,'bonus','bAddStealRate','number',NULL,NULL,NULL,NULL,'Steal rate'),
+
+(NULL,6,'bonus','bNoMadoFuel',NULL,NULL,NULL,NULL,NULL,'No Mado fuel'),
+
+(NULL,6,'bonus','bNoWalkDelay',NULL,NULL,NULL,NULL,NULL,'Infinite endure');
+
+INSERT INTO bonus_categories (id,name) VALUES
+(1,'Basic Bonuses'),
+(2,'Extended Bonuses'),
+(3,'Group-specific Bonuses'),
+(4,'Status Bonuses'),
+(5,'Auto Spell Bonuses'),
+(6,'Misc Bonuses');
+
+*/
+prontera,147,175,6	script	Card Collector	4_F_HUWOMAN,{
+
+//================================================
+// MAIN MENU
+//================================================
+
+Main:
+
+mes "[Card Collector]";
+mes "Welcome to the Card Collection System.";
+next;
+
+if(getgroupid()>=99)
+	menu
+	"Card Collections",L_Collections,
+	"Collections Owned",L_Owned,
+	"Info",L_Info,
+	"Admin Panel",L_Admin,
+	"Exit",L_Close;
+else
+	menu
+	"Card Collections",L_Collections,
+	"Collections Owned",L_Owned,
+	"Info",L_Info,
+	"Exit",L_Close;
+
+
+//================================================
+// LIST COLLECTIONS
+//================================================
+
+L_Collections:
+
+.acc = getcharid(3);
+
+query_sql("SELECT c.id,c.name,(SELECT COUNT(*) FROM collection_cards cc WHERE cc.collection_id=c.id),(SELECT COUNT(*) FROM account_collection_progress ap WHERE ap.account_id="+.acc+" AND ap.collection_id=c.id) FROM collection_db c WHERE c.active=1",.@cid,.@name$,.@total,.@done);
+
+.@menu$="";
+
+for(.@i=0;.@i<getarraysize(.@cid);.@i++){
+
+if(.@total[.@i] == 0)
+	.@menu$+="^AAAAAA"+.@name$[.@i]+" (Empty)^000000:";
+else if(.@done[.@i] >= .@total[.@i])
+	.@menu$+="^00CC66"+.@name$[.@i]+"^000000:";
+else
+	.@menu$+="^777777"+.@name$[.@i]+"^000000:";
+}
+
+.@menu$+="Back";
+
+.@sel=select(.@menu$);
+
+if(.@sel>getarraysize(.@cid))
+	goto Main;
+
+.collection=.@cid[.@sel-1];
+
+goto L_View;
+
+
+//================================================
+// VIEW COLLECTION
+//================================================
+
+L_View:
+
+clear;
+
+query_sql("SELECT name,bonus_desc FROM collection_db WHERE id="+.collection,.@name$,.@desc$);
+
+mes "[^0055FF"+.@name$+"^000000]";
+mes " ";
+
+mes "^0055FFCards:^000000";
+
+query_sql("SELECT item_id FROM collection_cards WHERE collection_id="+.collection,.@cards);
+
+for(.@i=0;.@i<getarraysize(.@cards);.@i++)
+	mes "• "+getitemname(.@cards[.@i]);
+
+mes " ";
+
+mes "^0055FFCollection Bonus:^000000";
+mes .@desc$;
+
+next;
+
+mes "What would you like to do?";
+
+menu
+"Deliver Cards",L_Deliver,
+"Back",L_Collections,
+"Exit",L_Close;
+
+
+//================================================
+// DELIVER CARDS
+//================================================
+
+L_Deliver:
+
+.@acc=getcharid(3);
+
+query_sql("SELECT COUNT(*) FROM account_collection_complete WHERE account_id="+.acc+" AND collection_id="+.collection,.@done);
+
+if(.@done){
+	clear;
+	mes "This collection was already completed.";
+	close;
+}
+
+query_sql("SELECT item_id FROM collection_cards WHERE collection_id="+.collection,.@cards);
+
+.@missing=0;
+
+for(.@i=0;.@i<getarraysize(.@cards);.@i++)
+	if(countitem(.@cards[.@i])<1)
+		.@missing++;
+
+if(.@missing){
+
+	mes "You are missing these cards:";
+	next;
+
+	for(.@i=0;.@i<getarraysize(.@cards);.@i++)
+		if(countitem(.@cards[.@i])<1)
+			mes "• "+getitemname(.@cards[.@i]);
+
+	close;
+}
+
+mes "You have all required cards.";
+mes "These cards will be permanently consumed.";
+next;
+
+switch(select("Confirm:Cancel")) {
+case 1:
+	goto DeliverConfirm;
+case 2:
+	close;
+}
+
+DeliverConfirm:
+
+query_sql("SELECT item_id FROM collection_cards WHERE collection_id="+.collection,.@cards);
+
+for(.@i=0;.@i<getarraysize(.@cards);.@i++){
+
+    if(countitem(.@cards[.@i]) >= 1)
+        delitem .@cards[.@i],1;
+
+    query_sql("INSERT INTO account_collection_progress VALUES ("+.acc+","+.collection+","+.@cards[.@i]+")");
+}
+
+query_sql("INSERT INTO account_collection_complete (account_id,collection_id) VALUES ("+.acc+","+.collection+")");
+
+query_sql("SELECT name FROM collection_db WHERE id="+.collection,.@name$);
+
+callsub ApplyBonuses;
+
+announce strcharinfo(0)+" completed the collection "+.@name$+"!",bc_all;
+
+mes "Collection completed!";
+mes "Your account has received the bonus.";
+
+close;
+
+
+//================================================
+// APPLY BONUSES
+//================================================
+
+ApplyBonuses:
+
+.@acc = getcharid(3);
+
+// limpa todos os bonus_script antigos
+bonus_script_clear;
+
+// pega bônus de coleções completas
+query_sql("SELECT cb.script FROM collection_bonus cb INNER JOIN account_collection_complete ac ON ac.collection_id=cb.collection_id INNER JOIN collection_db c ON c.id=cb.collection_id WHERE ac.account_id="+.@acc+" AND c.active=1",.@script$);
+
+for(.@i=0;.@i<getarraysize(.@script$);.@i++)
+	bonus_script .@script$[.@i],31536000,512|8;
+
+	dispbottom "Bonus count: "+getarraysize(.@script$);
+
+return;
+
+
+
+//================================================
+// OWNED COLLECTIONS
+//================================================
+
+L_Owned:
+
+.@acc=getcharid(3);
+
+query_sql("SELECT c.name FROM collection_db c INNER JOIN account_collection_complete ac ON ac.collection_id=c.id WHERE ac.account_id="+.acc+" ORDER BY c.name",.@name$);
+
+if(!getarraysize(.@name$)){
+	mes "You haven't completed any collections.";
+	close;
+}
+
+for(.@i=0;.@i<getarraysize(.@name$);.@i++)
+	mes "^00CC66"+.@name$[.@i]+"^000000";
+
+close;
+
+
+//================================================
+// INFO
+//================================================
+
+L_Info:
+
+mes "Card Collections allow adventurers";
+mes "to exchange monster cards";
+mes "for permanent bonuses for all your characters.";
+next;
+mes "Each collection requires a";
+mes "specific set of cards.";
+mes " ";
+mes "Deliver all cards at once";
+mes "to unlock the bonus.";
+close;
+
+
+//================================================
+// ADMIN PANEL
+//================================================
+
+L_Admin:
+
+menu
+"Create Collection",A_Create,
+"Edit Collection",A_Edit,
+"Activate Collection",A_Activate,
+"Deactivate Collection",A_Deactivate,
+"Back",Main;
+
+
+//================================================
+// CREATE COLLECTION
+//================================================
+
+A_Create:
+
+deletearray .tmp_cards;
+deletearray .tmp_bonus$;
+
+mes "Collection Name:";
+input .tmp_name$;
+
+goto CreateMenu;
+
+
+CreateMenu:
+
+clear;
+mes "[Creating Collection]";
+mes "Name: "+.tmp_name$;
+mes " ";
+
+mes "^0055FFCards:^000000";
+
+if(getarraysize(.tmp_cards) == 0)
+	mes "None added yet.";
+else
+	for(.@i=0;.@i<getarraysize(.tmp_cards);.@i++)
+		mes "• "+getitemname(.tmp_cards[.@i]);
+
+mes " ";
+
+mes "^0055FFBonuses:^000000 "+getarraysize(.tmp_bonus$);
+
+next;
+
+menu
+"Add Card",C_AddCard,
+"Add Bonus",C_AddBonus,
+"Bonus Description",C_SetDesc,
+"Create Collection",C_Save,
+"Cancel",Main;
+
+
+C_AddCard:
+
+mes "Enter Card Item ID:";
+input .@id;
+
+if(getiteminfo(.@id,ITEMINFO_TYPE) != IT_CARD){
+	mes "This item is not a card.";
+	close2;
+	goto C_AddCard;
+}
+
+.tmp_cards[getarraysize(.tmp_cards)] = .@id;
+
+mes "Added card:";
+mes getitemname(.@id);
+next;
+
+goto CreateMenu;
+
+
+C_AddBonus:
+
+callsub BonusBuilder;
+
+.tmp_bonus$[getarraysize(.tmp_bonus$)] = .bonus_script$;
+
+goto CreateMenu;
+
+
+C_SetDesc:
+
+mes "Enter bonus description:";
+input .tmp_desc$;
+
+goto CreateMenu;
+
+
+C_Save:
+
+if(getarraysize(.tmp_bonus$) == 0){
+	mes "You must add at least one bonus.";
+	close;
+}
+query_sql("INSERT INTO collection_db (name,bonus_desc) VALUES ('"+escape_sql(.tmp_name$)+"','"+escape_sql(.tmp_desc$)+"')");
+
+query_sql("SELECT id FROM collection_db WHERE name='"+escape_sql(.tmp_name$)+"' ORDER BY id DESC LIMIT 1",.@cid);
+
+for(.@i=0;.@i<getarraysize(.tmp_cards);.@i++)
+	query_sql("INSERT INTO collection_cards (collection_id,item_id) VALUES ("+.@cid+","+.tmp_cards[.@i]+")");
+
+for(.@i=0;.@i<getarraysize(.tmp_bonus$);.@i++)
+	query_sql("INSERT INTO collection_bonus (collection_id,script) VALUES ("+.@cid+",'"+escape_sql(.tmp_bonus$[.@i])+"')");
+
+mes "Collection created successfully.";
+close;
+
+//================================================
+// BONUS BUILDER (reused)
+//================================================
+
+BonusBuilder:
+
+query_sql("SELECT id,name FROM bonus_categories",.@cid,.@name$);
+
+.@menu$="";
+
+for(.@i=0;.@i<getarraysize(.@cid);.@i++)
+	.@menu$+=.@name$[.@i]+":";
+
+.@sel=select(.@menu$);
+
+.@cat=.@cid[.@sel-1];
+
+query_sql("SELECT id,bonus_cmd,description FROM bonus_list WHERE category_id="+.@cat,.@bid,.@bname$,.@desc$);
+
+.@menu$="";
+
+for(.@i=0;.@i<getarraysize(.@bid);.@i++)
+	.@menu$+=.@bname$[.@i]+":";
+
+.@sel=select(.@menu$);
+
+mes .@desc$[.@sel-1];
+next;
+
+mes "Enter value:";
+input .@v;
+
+query_sql("SELECT script_cmd,bonus_cmd FROM bonus_list WHERE id="+.@bid[.@sel-1],.@scmd$,.@bcmd$);
+
+.bonus_script$ = .@scmd$+" "+.@bcmd$+","+.@v+";";
+
+return;
+
+
+//================================================
+// EDIT COLLECTION
+//================================================
+
+A_Edit:
+
+query_sql("SELECT id,name FROM collection_db",.@cid,.@name$);
+
+.@menu$="";
+
+for(.@i=0;.@i<getarraysize(.@cid);.@i++)
+	.@menu$+=.@name$[.@i]+":";
+
+.@sel=select(.@menu$);
+
+.collection=.@cid[.@sel-1];
+
+mes "New Name:";
+input .@name$;
+
+query_sql("UPDATE collection_db SET name='"+escape_sql(.@name$)+"' WHERE id="+.collection);
+
+mes "Collection updated.";
+close;
+
+
+//================================================
+// ACTIVATE / DEACTIVATE
+//================================================
+
+A_Activate:
+
+query_sql("SELECT id,name FROM collection_db WHERE active=0",.@cid,.@name$);
+
+.@menu$="";
+for(.@i=0;.@i<getarraysize(.@cid);.@i++)
+	.@menu$+=.@name$[.@i]+":";
+
+.@sel=select(.@menu$);
+
+query_sql("UPDATE collection_db SET active=1 WHERE id="+.@cid[.@sel-1]);
+
+mes "Collection activated.";
+close;
+
+
+A_Deactivate:
+
+query_sql("SELECT id,name FROM collection_db WHERE active=1",.@cid,.@name$);
+
+.@menu$="";
+for(.@i=0;.@i<getarraysize(.@cid);.@i++)
+	.@menu$+=.@name$[.@i]+":";
+
+.@sel=select(.@menu$);
+
+query_sql("UPDATE collection_db SET active=0 WHERE id="+.@cid[.@sel-1]);
+
+mes "Collection deactivated.";
+close;
+
+
+L_Close:
+close;
+}
+
+-	script	CardCollection_Login	-1,{
+
+OnPCLoginEvent:
+
+.@acc = getcharid(3);
+
+bonus_script_clear;
+
+query_sql("SELECT cb.script FROM collection_bonus cb INNER JOIN account_collection_complete ac ON ac.collection_id=cb.collection_id INNER JOIN collection_db c ON c.id=cb.collection_id WHERE ac.account_id="+.@acc+" AND c.active=1",.@script$);
+
+for(.@i=0;.@i<getarraysize(.@script$);.@i++)
+	bonus_script .@script$[.@i],31536000,512|8;
+
+end;
+}

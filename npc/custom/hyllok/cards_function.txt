@@ -1,0 +1,22 @@
+// ======================================================
+// ================= SELECIONAR COLEÇÃO ==================
+// ======================================================
+function    F_SelectCollection	{
+
+	query_sql("SELECT id,name FROM collection_db ORDER BY id",.@cid,.@cname$);
+	if (!getarraysize(.@cid))
+		return -1;
+
+	.@menu$="";
+	for (.@i=0;.@i<getarraysize(.@cid);.@i++)
+		.@menu$ = .@menu$ + .@cname$[.@i] + ":";
+
+	.@menu$ = .@menu$ + "Cancelar";
+
+	.@sel = select(.@menu$);
+
+	if (.@sel > getarraysize(.@cid))
+		return -1;
+
+	return .@cid[.@sel-1];
+}

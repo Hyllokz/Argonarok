@@ -616,6 +616,42 @@ bool party_reply_invite( map_session_data& sd, int32 party_id, int32 flag ){
 	return false;
 }
 
+static int party_recalc_status_timer(int tid, int64 tick, int id, intptr_t data)
+{
+	struct party_data* p = party_search(id);
+
+	if (!p)
+		return 0;
+
+	for (int i = 0; i < MAX_PARTY; i++) {
+		map_session_data* sd = p->data[i].sd;
+
+		if (!sd)
+			continue;
+
+		status_calc_pc(sd, SCO_NONE);
+	}
+
+	return 0;
+}
+
+// Recalculates the status of all party members, should be called when a member joins/leaves or changes class to update the class bonuses of the party.
+//Hyllok
+static void party_recalc_status(struct party_data* p)
+{
+	if (!p)
+		return;
+
+	for (int i = 0; i < MAX_PARTY; i++) {
+		map_session_data* sd = p->data[i].sd;
+
+		if (!sd)
+			continue;
+
+		status_calc_pc(sd, SCO_NONE);
+	}
+}
+
 //Invoked when a player joins:
 //- Loads up party data if not in server
 //- Sets up the pointer to him
@@ -636,6 +672,8 @@ void party_member_joined( map_session_data& sd ){
 	} else
 		sd.status.party_id = 0; //He does not belongs to the party really?
 }
+
+
 
 /// Invoked (from char-server) when a new member is added to the party.
 /// flag: 0-success, 1-failure
@@ -688,6 +726,8 @@ int32 party_member_added(int32 party_id,uint32 account_id,uint32 char_id, int32 
 	clif_party_hp( *sd );
 	clif_party_xy( *sd );
 	clif_name_area(sd); //Update char name's display [Skotlex]
+	// Recalcular status de todos da party (para atualizar bônus de classe)
+	party_recalc_status(p);
 
 	if (p->instance_id > 0)
 		instance_reqinfo(sd, p->instance_id);
@@ -844,6 +884,9 @@ int32 party_member_withdraw(int32 party_id, uint32 account_id, uint32 char_id, c
 			}
 		}
 	}
+		// Recalcular bônus da party
+		if( p )
+		party_recalc_status(p);
 
 	return 0;
 }
@@ -868,6 +911,8 @@ int32 party_broken(int32 party_id)
 			p->data[i].sd->status.party_id=0;
 		}
 	}
+	// Recalcular status após dissolver a party
+	party_recalc_status(p);
 
 	idb_remove(party_db,party_id);
 

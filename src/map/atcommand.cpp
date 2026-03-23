@@ -1961,11 +1961,13 @@ ACMD_FUNC(bodystyle){
 	nullpo_retr(-1, sd);
 
 	std::shared_ptr<s_job_info> job = job_db.find( sd->status.class_ );
-
+	
+	#if PACKETVER < 20231220
 	if( job == nullptr || job->alternate_outfits.empty() ){
 		clif_displaymessage( fd, msg_txt( sd, 740 ) ); // This job has no alternate body styles.
 		return -1;
 	}
+	#endif
 
 	if( message == nullptr || !*message ){
 		if( const char* help = atcommand_help_string( command ); help != nullptr ){

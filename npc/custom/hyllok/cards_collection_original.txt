@@ -1,0 +1,581 @@
+/*
+CREATE TABLE `collection_db` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(100) NOT NULL,
+  `region` VARCHAR(100) NOT NULL,
+  `bonus_script` TEXT NOT NULL,
+  `buff_desc` TEXT NOT NULL,
+  `active` TINYINT(1) DEFAULT 1
+);
+
+CREATE TABLE `collection_cards` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `collection_id` INT NOT NULL,
+  `item_id` INT NOT NULL,
+  FOREIGN KEY (`collection_id`) REFERENCES `collection_db`(`id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `account_collection_progress` (
+  `account_id` INT NOT NULL,
+  `collection_id` INT NOT NULL,
+  `item_id` INT NOT NULL,
+  PRIMARY KEY (`account_id`,`collection_id`,`item_id`)
+);
+
+CREATE TABLE `account_collection_complete` (
+  `account_id` INT NOT NULL,
+  `collection_id` INT NOT NULL,
+  PRIMARY KEY (`account_id`,`collection_id`)
+);
+*/
+/*
+   ================================
+   SISTEMA DE COLE��ES DE CARTAS
+   ================================
+*/
+
+prontera,150,180,4	script	Colecionador	123,{
+
+	mes "[Colecionador]";
+	mes "Sistema de ^0055FFCole��es de Cartas^000000.";
+	next;
+
+MainMenu:
+	if (getgroupid() > 98)
+		menu "Exibir cole��es",L_List,
+		     "Cole��es completas",L_Complete,
+		     "Como funciona?",L_Info,
+		     "[GM] Painel Admin",L_Admin;
+	else
+		menu "Exibir cole��es",L_List,
+		     "Cole��es completas",L_Complete,
+		     "Como funciona?",L_Info;
+	end;
+
+
+// ======================================================
+// INFO
+// ======================================================
+
+L_Info:
+	mes "Entregue cartas raras.";
+	mes "Cada carta entregue � permanente.";
+	mes "Complete cole��es para desbloquear buffs.";
+	close;
+
+
+// ======================================================
+// LISTAGEM
+// ======================================================
+
+L_List:
+	.@acc = getcharid(3);
+	.@page = 0;
+
+LoadPage:
+
+	query_sql("SELECT c.id,c.name,(SELECT COUNT(*) FROM collection_cards cc WHERE cc.collection_id=c.id),(SELECT COUNT(*) FROM account_collection_progress ap WHERE ap.account_id="+.@acc+" AND ap.collection_id=c.id) FROM collection_db c WHERE c.active=1 ORDER BY c.id LIMIT "+(.@page*10)+",10",.@cid,.@name$,.@total,.@done);
+
+	.@size = getarraysize(.@cid);
+
+	if (!.@size) {
+		mes "Nenhuma cole��o.";
+		close;
+	}
+
+	mes "[Cole��es - P�gina "+(.@page+1)+"]";
+
+	.@menu$ = "";
+
+	for (.@i=0;.@i<.@size;.@i++) {
+
+		if (.@done[.@i] == 0)
+			.@color$="^777777";
+		else if (.@done[.@i] < .@total[.@i])
+			.@color$="^FFAA00";
+		else
+			.@color$="^00CC66";
+
+		.@menu$ += .@color$ + .@name$[.@i] + " ["+.@done[.@i]+"/"+.@total[.@i]+"]^000000:";
+	}
+
+	if (.@page > 0)
+		.@menu$ += "P�gina anterior:";
+	if (.@size == 10)
+		.@menu$ += "Pr�xima p�gina:";
+
+	.@menu$ += "Voltar";
+
+	.@sel = select(.@menu$);
+
+	if (.@sel <= .@size) {
+		callsub S_View,.@cid[.@sel-1];
+		goto LoadPage;
+	}
+
+	if (.@page > 0 && .@sel == .@size+1) {
+		.@page--;
+		goto LoadPage;
+	}
+
+	if (.@size == 10 && .@sel == .@size+(.@page>0?2:1)) {
+		.@page++;
+		goto LoadPage;
+	}
+
+	goto MainMenu;
+
+
+// ======================================================
+// VISUALIZAR (VERS�O FINAL - TUDO EM UMA �NICA JANELA)
+// ======================================================
+
+S_View:
+	.@cid = getarg(0);
+	.@acc = getcharid(3);
+
+	clear;
+
+	query_sql("SELECT name,buff_desc FROM collection_db WHERE id="+.@cid,.@name$,.@desc$);
+
+	query_sql("SELECT COUNT(*) FROM account_collection_complete WHERE account_id="+.@acc+" AND collection_id="+.@cid,.@is_complete);
+
+	query_sql("SELECT cc.item_id,(SELECT COUNT(*) FROM account_collection_progress ap WHERE ap.account_id="+.@acc+" AND ap.collection_id="+.@cid+" AND ap.item_id=cc.item_id) FROM collection_cards cc WHERE cc.collection_id="+.@cid,.@card,.@have);
+
+	mes "[^0055FF"+.@name$+"^000000]";
+	mes " ";
+	mes "^0055FFBuff:^000000";
+	mes .@desc$;
+	mes " ";
+	mes "--------------------------------";
+	mes "^FF4444Cartas Pendentes:^000000";
+
+	.@has_pending = 0;
+
+	for (.@i=0;.@i<getarraysize(.@card);.@i++) {
+		if (!.@have[.@i]) {
+			mes "� ^FF4444 "+getitemname(.@card[.@i])+"^000000";
+			.@has_pending = 1;
+		}
+	}
+
+	if (!.@has_pending)
+		mes "^00CC66Nenhuma pendente.^000000";
+
+	mes " ";
+	mes "^00CC66Cartas Entregues:^000000";
+
+	.@has_done = 0;
+
+	for (.@i=0;.@i<getarraysize(.@card);.@i++) {
+		if (.@have[.@i]) {
+			mes "^00CC66? "+getitemname(.@card[.@i])+"^000000";
+			.@has_done = 1;
+		}
+	}
+
+	if (!.@has_done)
+		mes "^777777Nenhuma entregue ainda.^000000";
+
+	// MENU FINAL
+	if (!.@is_complete && .@has_pending)
+		menu "Entregar cartas",Deliver,"Voltar",Back;
+	else
+		menu "Voltar",Back;
+
+Deliver:
+	callsub S_Deliver,.@cid;
+Back:
+	clear;
+	return;
+
+// ======================================================
+// ENTREGAR
+// ======================================================
+
+S_Deliver:
+	.@cid = getarg(0);
+	.@acc = getcharid(3);
+
+	query_sql("SELECT item_id FROM collection_cards WHERE collection_id="+.@cid,.@cards);
+
+	for (.@i=0;.@i<getarraysize(.@cards);.@i++) {
+
+		if (countitem(.@cards[.@i]) > 0) {
+
+			query_sql("SELECT COUNT(*) FROM account_collection_progress WHERE account_id="+.@acc+" AND collection_id="+.@cid+" AND item_id="+.@cards[.@i],.@exists);
+
+			if (!.@exists) {
+				delitem .@cards[.@i],1;
+				query_sql("INSERT INTO account_collection_progress VALUES ("+.@acc+","+.@cid+","+.@cards[.@i]+")");
+			}
+		}
+	}
+
+	query_sql("SELECT COUNT(*) FROM collection_cards WHERE collection_id="+.@cid,.@total);
+	query_sql("SELECT COUNT(*) FROM account_collection_progress WHERE account_id="+.@acc+" AND collection_id="+.@cid,.@done);
+
+	if (.@total > 0 && .@done >= .@total) {
+
+		query_sql("REPLACE INTO account_collection_complete (account_id,collection_id) VALUES ("+.@acc+","+.@cid+")");
+
+		announce strcharinfo(0)+" completou uma cole��o!",bc_blue|bc_all;
+
+		callsub S_ReapplyAccountBonus;
+	}
+
+	return;
+
+
+// ======================================================
+// REAPLICAR BONUS
+// ======================================================
+
+S_ReapplyAccountBonus:
+
+	.@acc = getcharid(3);
+
+	bonus_script_clear;
+
+	query_sql("SELECT c.bonus_script FROM collection_db c INNER JOIN account_collection_complete a ON a.collection_id=c.id WHERE a.account_id="+.@acc,.@bonus$);
+
+	for (.@i=0;.@i<getarraysize(.@bonus$);.@i++)
+		bonus_script .@bonus$[.@i],31536000,512|8;
+
+	dispbottom "B�nus de cole��es aplicados.";
+
+	return;
+
+
+// ======================================================
+// COMPLETAS
+// ======================================================
+
+L_Complete:
+	.@acc = getcharid(3);
+
+	query_sql("SELECT c.name,c.buff_desc FROM collection_db c INNER JOIN account_collection_complete a ON a.collection_id=c.id WHERE a.account_id="+.@acc,.@name$,.@desc$);
+
+	if (!getarraysize(.@name$)) {
+		mes "Nenhuma cole��o completa.";
+		close;
+	}
+
+	for (.@i=0;.@i<getarraysize(.@name$);.@i++) {
+		mes "^00CC66"+.@name$[.@i]+"^000000";
+		mes .@desc$[.@i];
+		next;
+	}
+
+	close;
+
+
+// ======================================================
+// ================= ADMIN PANEL =========================
+// ======================================================
+
+L_Admin:
+	if (getgroupid() <= 98) end;
+
+	mes "[Painel Administrativo]";
+	menu
+	"Criar nova cole��o",A_Create,
+	"Editar cole��o",A_Edit,
+	"Adicionar cartas a cole��o",A_AddCard,
+	"Remover carta de cole��o",A_RemoveCard,
+	"Ativar / Desativar cole��o",A_Toggle,
+	"Excluir cole��o",A_Delete,
+	"Resetar progresso de conta",A_Reset,
+	"Voltar",MainMenu;
+	end;
+
+
+// ======================================================
+// ============= SUB: Selecionar Cole��o ================
+// ======================================================
+
+S_SelectCollection:
+
+	query_sql("SELECT id,name FROM collection_db ORDER BY id",.@cid,.@cname$);
+
+	if (!getarraysize(.@cid)) {
+		mes "Nenhuma cole��o cadastrada.";
+		return -1;
+	}
+
+	.@menu$="";
+	for (.@i=0;.@i<getarraysize(.@cid);.@i++)
+		.@menu$ = .@menu$ + .@cname$[.@i] + ":";
+
+	.@menu$ = .@menu$ + "Cancelar";
+
+	.@sel = select(.@menu$);
+
+	if (.@sel > getarraysize(.@cid))
+		return -1;
+
+	return .@cid[.@sel-1];
+
+
+// ======================================================
+// ================= CRIAR COLE��O =======================
+// ======================================================
+
+A_Create:
+
+	mes "[Nova Cole��o]";
+	mes "Nome:";
+	input .@name$;
+	if (.@name$ == "") { mes "Nome inv�lido."; close; }
+
+	query_sql("SELECT COUNT(*) FROM collection_db WHERE name='"+escape_sql(.@name$)+"'",.@exists);
+	if (.@exists) { mes "J� existe cole��o com esse nome."; close; }
+
+	mes "Regi�o:";
+	input .@region$;
+
+	mes "Descri��o do Buff:";
+	input .@desc$;
+
+	mes "Bonus Script:";
+	mes "Exemplo: { bonus bStr,5; }";
+	next;
+	input .@bonus$;
+	if (.@bonus$ == "") { mes "Bonus inv�lido."; close; }
+
+	.@cardcount = 0;
+
+AddCardLoop:
+
+	mes "[Adicionar Cartas]";
+	mes "Digite o Item ID.";
+	mes "Digite ^FF00000^000000 para finalizar.";
+
+	if (.@cardcount > 0) {
+		mes "^00CC66Cartas adicionadas:^000000";
+		for (.@i=0;.@i<.@cardcount;.@i++)
+			mes "- "+getitemname(.@cards[.@i])+" ("+.@cards[.@i]+")";
+		next;
+	}
+
+	input .@item;
+
+	if (.@item == 0) {
+		if (.@cardcount == 0) {
+			mes "Adicione pelo menos 1 carta.";
+			goto AddCardLoop;
+		}
+		goto ConfirmCreate;
+	}
+
+	if (getiteminfo(.@item,ITEMINFO_TYPE) != IT_CARD) {
+		mes "Este item n�o � uma carta v�lida.";
+		goto AddCardLoop;
+	}
+
+	for (.@i=0;.@i<.@cardcount;.@i++)
+		if (.@cards[.@i] == .@item) {
+			mes "Carta j� adicionada.";
+			goto AddCardLoop;
+		}
+
+	.@cards[.@cardcount] = .@item;
+	.@cardcount++;
+	goto AddCardLoop;
+
+
+ConfirmCreate:
+
+	mes "[Confirma��o Final]";
+	mes "Nome: "+.@name$;
+	mes "Regi�o: "+.@region$;
+	mes "Descri��o: "+.@desc$;
+	next;
+	mes "Bonus Script:";
+	mes .@bonus$;
+	next;
+	mes "Cartas:";
+	for (.@i=0;.@i<.@cardcount;.@i++)
+		mes "- "+getitemname(.@cards[.@i]);
+	next;
+
+	menu "Confirmar",DoCreate,"Cancelar",CancelCreate;
+
+DoCreate:
+
+	query_sql("INSERT INTO collection_db (name,region,bonus_script,buff_desc) VALUES ('"+escape_sql(.@name$)+"','"+escape_sql(.@region$)+"','"+escape_sql(.@bonus$)+"','"+escape_sql(.@desc$)+"')");
+
+	query_sql("SELECT id FROM collection_db WHERE name='"+escape_sql(.@name$)+"' ORDER BY id DESC LIMIT 1",.@newid);
+
+	for (.@i=0;.@i<.@cardcount;.@i++)
+		query_sql("INSERT INTO collection_cards (collection_id,item_id) VALUES ("+.@newid+","+.@cards[.@i]+")");
+
+	mes "Cole��o criada com sucesso!";
+	close;
+
+CancelCreate:
+	mes "Opera��o cancelada.";
+	close;
+
+
+// ======================================================
+// ================= EDITAR COLE��O ======================
+// ======================================================
+
+A_Edit:
+
+.@cid = callsub(S_SelectCollection);
+if (.@cid == -1) close;
+
+	mes "1-Nome 2-Regi�o 3-Descri��o 4-Bonus";
+	input .@opt;
+	input .@new$;
+
+	if (.@opt == 1) query_sql("UPDATE collection_db SET name='"+escape_sql(.@new$)+"' WHERE id="+.@cid);
+	if (.@opt == 2) query_sql("UPDATE collection_db SET region='"+escape_sql(.@new$)+"' WHERE id="+.@cid);
+	if (.@opt == 3) query_sql("UPDATE collection_db SET buff_desc='"+escape_sql(.@new$)+"' WHERE id="+.@cid);
+	if (.@opt == 4) query_sql("UPDATE collection_db SET bonus_script='"+escape_sql(.@new$)+"' WHERE id="+.@cid);
+
+	mes "Atualizado.";
+	close;
+
+
+// ======================================================
+// ================= ADICIONAR CARTA =====================
+// ======================================================
+
+A_AddCard:
+
+.@cid = callsub(S_SelectCollection);
+if (.@cid == -1) close;
+
+	input .@item;
+
+	if (getiteminfo(.@item,ITEMINFO_TYPE) != IT_CARD) {
+		mes "Item inv�lido.";
+		close;
+	}
+
+	query_sql("INSERT INTO collection_cards (collection_id,item_id) VALUES ("+.@cid+","+.@item+")");
+
+	mes "Carta adicionada.";
+	close;
+
+
+// ======================================================
+// ================= REMOVER CARTA =======================
+// ======================================================
+
+A_RemoveCard:
+
+.@cid = callsub(S_SelectCollection);
+if (.@cid == -1) close;
+
+	query_sql("SELECT item_id FROM collection_cards WHERE collection_id="+.@cid,.@cards);
+
+	if (!getarraysize(.@cards)) {
+		mes "Sem cartas.";
+		close;
+	}
+
+	.@menu$="";
+	for (.@i=0;.@i<getarraysize(.@cards);.@i++)
+		.@menu$ = .@menu$ + getitemname(.@cards[.@i]) + ":";
+
+	.@menu$ = .@menu$ + "Cancelar";
+
+	.@sel = select(.@menu$);
+	if (.@sel > getarraysize(.@cards)) close;
+
+	query_sql("DELETE FROM collection_cards WHERE collection_id="+.@cid+" AND item_id="+.@cards[.@sel-1]);
+
+	mes "Carta removida.";
+	close;
+
+
+// ======================================================
+// ================= ATIVAR / DESATIVAR ==================
+// ======================================================
+
+A_Toggle:
+
+.@cid = callsub(S_SelectCollection);
+if (.@cid == -1) close;
+
+	query_sql("SELECT active FROM collection_db WHERE id="+.@cid,.@act);
+
+	if (.@act)
+		query_sql("UPDATE collection_db SET active=0 WHERE id="+.@cid);
+	else
+		query_sql("UPDATE collection_db SET active=1 WHERE id="+.@cid);
+
+	mes "Alterado.";
+	close;
+
+
+// ======================================================
+// ================= EXCLUIR COLE��O =====================
+// ======================================================
+
+A_Delete:
+
+.@cid = callsub(S_SelectCollection);
+if (.@cid == -1) close;
+
+	mes "^FF0000ATEN��O:^000000";
+	mes "Isso remover� permanentemente:";
+	mes "- Cole��o";
+	mes "- Cartas";
+	mes "- Progresso de todas contas";
+	next;
+
+	menu "Confirmar exclus�o",DoDelete,"Cancelar",CancelDelete;
+
+DoDelete:
+
+	query_sql("DELETE FROM collection_db WHERE id="+.@cid);
+	query_sql("DELETE FROM collection_cards WHERE collection_id="+.@cid);
+	query_sql("DELETE FROM account_collection_progress WHERE collection_id="+.@cid);
+	query_sql("DELETE FROM account_collection_complete WHERE collection_id="+.@cid);
+
+	mes "Cole��o exclu�da.";
+	close;
+
+CancelDelete:
+	mes "Cancelado.";
+	close;
+
+
+// ======================================================
+// ================= RESET CONTA =========================
+// ======================================================
+
+A_Reset:
+
+	mes "Digite o account_id:";
+	input .@acc;
+
+	query_sql("DELETE FROM account_collection_progress WHERE account_id="+.@acc);
+	query_sql("DELETE FROM account_collection_complete WHERE account_id="+.@acc);
+
+	mes "Progresso resetado.";
+	close;
+}
+
+// ======================================================
+// LOGIN BONUS (FORA DO NPC)
+// ======================================================
+
+-	script	CollectionBonusLogin	-1,{
+
+OnPCLoginEvent:
+
+	.@acc = getcharid(3);
+
+	query_sql("SELECT c.bonus_script FROM collection_db c INNER JOIN account_collection_complete a ON a.collection_id=c.id WHERE a.account_id="+.@acc,.@bonus$);
+
+	for (.@i=0;.@i<getarraysize(.@bonus$);.@i++)
+		bonus_script .@bonus$[.@i],31536000,512|8;
+
+	end;
+}

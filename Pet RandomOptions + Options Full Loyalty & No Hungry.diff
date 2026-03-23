@@ -1,0 +1,523 @@
+ conf/battle/pet.conf |  10 +++
+ src/map/battle.cpp   |   5 ++
+ src/map/battle.hpp   |   5 ++
+ src/map/clif.cpp     |  11 ++++
+ src/map/pet.cpp      | 182 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/map/pet.hpp      |  25 +++++++
+ src/map/script.cpp   | 121 ++++++++++++++++++++++++++++++++++
+ src/map/status.cpp   |  25 +++++++
+ 8 files changed, 384 insertions(+)
+
+diff --git a/conf/battle/pet.conf b/conf/battle/pet.conf
+index 75f4f0fbb..a1c6bd3fa 100644
+--- a/conf/battle/pet.conf
++++ b/conf/battle/pet.conf
+@@ -101,3 +101,13 @@ pet_autofeed_always: yes
+ // 2: DEFAULT_WALK_SPEED value
+ // 3: Mob database walk speed
+ pet_walk_speed: 1
++
++// [RomuloSM]: Pet Random Option
++// Random Option for full Loyalty.
++pet_random_full_loyalty: 2028
++
++// Random Option for no hunger.
++pet_random_not_hungry: 2029
++
++// Random Option for high Loyalty and no hunger.
++pet_random_full_loyalty_not_hungry: 2030
+diff --git a/src/map/battle.cpp b/src/map/battle.cpp
+index 0eb42fdb0..d2dc0df26 100644
+--- a/src/map/battle.cpp
++++ b/src/map/battle.cpp
+@@ -10631,6 +10631,11 @@ static const struct _battle_data {
+ 	{ "feature.instance_allow_reconnect",   &battle_config.instance_allow_reconnect,        0,      0,      1,              },
+ #endif
+ 
++	// [RomuloSM]: Pet Random Option
++	{ "pet_random_full_loyalty",            &battle_config.pet_random_full_loyalty,                   2028,      0,      INT_MAX,       },
++	{ "pet_random_not_hungry",              &battle_config.pet_random_not_hungry,                     2029,      0,      INT_MAX,       },
++	{ "pet_random_full_loyalty_not_hungry", &battle_config.pet_random_full_loyalty_not_hungry,        2030,      0,      INT_MAX,       },
++
+ #include <custom/battle_config_init.inc>
+ };
+ 
+diff --git a/src/map/battle.hpp b/src/map/battle.hpp
+index 600e62775..6b7918678 100644
+--- a/src/map/battle.hpp
++++ b/src/map/battle.hpp
+@@ -732,6 +732,11 @@ struct Battle_Config
+ 	int feature_banking_state_enforce;
+ 	int instance_allow_reconnect;
+ 
++	// [RomuloSM]: Pet Random Option
++	int pet_random_full_loyalty;
++	int pet_random_not_hungry;
++	int pet_random_full_loyalty_not_hungry;
++
+ #include <custom/battle_config_struct.inc>
+ };
+ 
+diff --git a/src/map/clif.cpp b/src/map/clif.cpp
+index 991b5b1b8..b20fe625c 100644
+--- a/src/map/clif.cpp
++++ b/src/map/clif.cpp
+@@ -2710,6 +2710,17 @@ static void clif_addcards( struct EQUIPSLOTINFO* buf, struct item* item ){
+ 
+ 	// Pet eggs
+ 	if( item->card[0] == CARD0_PET ){
++		// [RomuloSM]: Pet Random Option
++		int i;
++		ARR_FIND(0, MAX_ITEM_RDM_OPT, i, item->option[i].id != 0);
++		if( i < MAX_ITEM_RDM_OPT ) {
++			buf->card[0] = 0;
++			buf->card[1] = 0;
++			buf->card[2] = 0;
++			buf->card[3] = 0;
++			return;
++		}
++
+ 		buf->card[0] = 0;
+ 		buf->card[1] = 0;
+ 		// Pet intimacy
+diff --git a/src/map/pet.cpp b/src/map/pet.cpp
+index 6d1c59503..f85895db1 100644
+--- a/src/map/pet.cpp
++++ b/src/map/pet.cpp
+@@ -845,6 +845,10 @@ static TIMER_FUNC(pet_hungry){
+ 
+ 	pd->pet_hungry_timer = INVALID_TIMER;
+ 
++	// [RomuloSM]: Pet Random Option
++	if( pet_check_special_options(sd, pd, PET_FULL_LOYALTY) )
++		pd->pet.intimate = PET_INTIMATE_MAX;
++
+ 	if (pd->pet.intimate <= PET_INTIMATE_NONE)
+ 		return 1; //You lost the pet already, the rest is irrelevant.
+ 
+@@ -857,6 +861,10 @@ static TIMER_FUNC(pet_hungry){
+ 
+ 	pd->pet.hungry -= pet_db_ptr->fullness;
+ 
++	// [RomuloSM]: Pet Random Option
++	if( pet_check_special_options(sd, pd, PET_NOT_HUNGRY) )
++		pd->pet.hungry = PET_HUNGRY_STUFFED;
++
+ 	if( pd->pet.hungry < PET_HUNGRY_NONE ) {
+ 		pet_stop_attack(pd);
+ 		pd->pet.hungry = PET_HUNGRY_NONE;
+@@ -1034,6 +1042,12 @@ bool pet_data_init(map_session_data *sd, struct s_pet *pet)
+ 	unit_dataset(&pd->bl);
+ 	pd->ud.dir = sd->ud.dir;
+ 
++	// [RomuloSM]: Pet Random Option
++	if( pet_check_special_options(sd, pd, PET_FULL_LOYALTY) )
++		pd->pet.intimate = PET_INTIMATE_MAX;
++	if( pet_check_special_options(sd, pd, PET_NOT_HUNGRY) )
++		pd->pet.hungry = PET_HUNGRY_STUFFED;
++
+ 	pd->bl.m = sd->bl.m;
+ 	pd->bl.x = sd->bl.x;
+ 	pd->bl.y = sd->bl.y;
+@@ -1377,6 +1391,91 @@ bool pet_get_egg(uint32 account_id, short pet_class, int pet_id ) {
+ 	tmp_item.card[3] = 0; //New pets are not named.
+ 	tmp_item.card[3] |= pet_get_card3_intimacy( pet->intimate ); // Store intimacy status based on initial intimacy
+ 
++	// [RomuloSM]: Pet Random Option
++	std::shared_ptr<s_pet_random_option> prndopt = pet_randomoption_db.find(pet->EggID);
++	if( prndopt != nullptr ) {
++		std::shared_ptr<s_random_opt_group> group = random_option_group.find(prndopt->randomopt_group);
++
++		auto apply_sub = []( s_item_randomoption& item_option, const std::shared_ptr<s_random_opt_group_entry>& option ){
++			item_option.id = option->id;
++			item_option.value = rnd_value( option->min_value, option->max_value );
++			item_option.param = option->param;
++		};
++
++			// (Re)initialize all the options
++		for( size_t i = 0; i < MAX_ITEM_RDM_OPT; i++ ){
++			tmp_item.option[i].id = 0;
++			tmp_item.option[i].value = 0;
++			tmp_item.option[i].param = 0;
++		};
++
++		for( size_t i = 0; i < group->slots.size(); i++ ){
++			// Try to apply an entry
++			for( size_t j = 0, max = group->slots[static_cast<uint16>(i)].size() * 3; j < max; j++ ){
++				std::shared_ptr<s_random_opt_group_entry> option = util::vector_random( group->slots[static_cast<uint16>(i)] );
++
++				if( rnd() % 10000 < option->chance ){
++					apply_sub( tmp_item.option[i], option );
++					break;
++				}
++			}
++
++			// If no entry was applied, assign one
++			if( tmp_item.option[i].id == 0 ){
++				std::shared_ptr<s_random_opt_group_entry> option = util::vector_random( group->slots[static_cast<uint16>(i)] );
++
++				// Apply an entry without checking the chance
++				apply_sub( tmp_item.option[i], option );
++			}
++		}
++
++		// Apply Random options (if available)
++		if( group->max_random > 0 ){
++			for( size_t i = 0; i < min( group->max_random, MAX_ITEM_RDM_OPT ); i++ ){
++				// If item already has an option in this slot, skip it
++				if( tmp_item.option[i].id > 0 ){
++					continue;
++				}
++
++				std::shared_ptr<s_random_opt_group_entry> option = util::vector_random( group->random_options );
++
++				if( rnd() % 10000 < option->chance ){
++					apply_sub( tmp_item.option[i], option );
++				}
++			}
++		}
++
++		// Fix any gaps, the client cannot handle this
++		for( size_t i = 0; i < MAX_ITEM_RDM_OPT; i++ ){
++			// If an option is empty
++			if( tmp_item.option[i].id == 0 ){
++				// Check if any other options, after the empty option exist
++				size_t j;
++				for( j = i + 1; j < MAX_ITEM_RDM_OPT; j++ ){
++					if(tmp_item.option[j].id != 0 ){
++						break;
++					}
++				}
++
++				// Another option was found, after the empty option
++				if( j < MAX_ITEM_RDM_OPT ){
++					// Move the later option forward
++					tmp_item.option[i].id = tmp_item.option[j].id;
++					tmp_item.option[i].value = tmp_item.option[j].value;
++					tmp_item.option[i].param = tmp_item.option[j].param;
++
++					// Reset the option that was moved
++					tmp_item.option[j].id = 0;
++					tmp_item.option[j].value = 0;
++					tmp_item.option[j].param = 0;
++				}else{
++					// Cancel early
++					break;
++				}
++			}
++		}
++	}
++
+ 	if((ret = pc_additem(sd,&tmp_item,1,LOG_TYPE_PICKDROP_PLAYER))) {
+ 		clif_additem(sd,0,0,ret);
+ 		map_addflooritem(&tmp_item,1,sd->bl.m,sd->bl.x,sd->bl.y,0,0,0,0,0);
+@@ -2453,12 +2552,94 @@ TIMER_FUNC(pet_endautobonus) {
+ 	return 0;
+ }
+ 
++// [RomuloSM]: Pet Random Option
++PetRandomOptionDatabase pet_randomoption_db;
++
++const std::string PetRandomOptionDatabase::getDefaultLocation() {
++	return std::string(db_path) + "/rsm-mod/pet_randomoption_db.yml";
++}
++
++uint64 PetRandomOptionDatabase::parseBodyNode( const ryml::NodeRef& node ){
++	t_itemid item_id;
++
++	std::string name;
++
++	if( !this->asString( node, "Item", name ) ){
++		return 0;
++	}
++
++
++	std::shared_ptr<item_data> id = item_db.search_aegisname(name.c_str());
++	
++	if( id == nullptr ){
++		this->invalidWarning( node["Item"], "Unknown item \"%s\".\n", name.c_str() );
++		return 0;
++	}
++
++	item_id = id->nameid;
++
++	std::shared_ptr<s_pet_db> pet = pet_db_search(item_id, PET_EGG);
++
++	if( pet == nullptr ) {
++		this->invalidWarning( node["Item"], "Pet Egg not found for item \"%s\".\n", name.c_str() );
++		return 0;
++	}
++
++	std::shared_ptr<s_pet_random_option> prndopt = this->find(item_id);
++	bool exists = prndopt != nullptr;
++
++	if (!exists) {
++		if (!this->nodesExist(node, { "RandomOptionGroup" }))
++			return 0;
++
++		prndopt = std::make_shared<s_pet_random_option>();
++		prndopt->nameId = item_id;
++	}
++
++	if (this->nodeExists(node, "RandomOptionGroup")) {
++		uint16 group = 0;
++		std::string group_name;
++
++		if (!this->asString(node, "RandomOptionGroup", group_name))
++			return false;
++
++		if (!random_option_group.option_get_id(group_name.c_str(), group))
++			this->invalidWarning(node["RandomOptionGroup"], "Unknown random option group %s for egg %s, defaulting to no group.\n", group_name.c_str(), name.c_str());
++
++		prndopt->randomopt_group = group;
++	}
++
++	if (!exists)
++		this->put(prndopt->nameId, prndopt);
++
++	return 1;
++}
++
++bool pet_check_special_options(map_session_data *sd, struct pet_data *pd, uint8 type) {
++	nullpo_retr(false, sd);
++	nullpo_retr(false, pd);
++
++	int i = MAX_ITEM_RDM_OPT, n = pet_egg_search( sd, pd->pet.pet_id );
++
++	if( n == -1 ){
++		return false;
++ 	}
++
++	if( type == PET_FULL_LOYALTY && battle_config.pet_random_full_loyalty )
++		ARR_FIND(0, MAX_ITEM_RDM_OPT, i, sd->inventory.u.items_inventory[n].option[i].id == battle_config.pet_random_full_loyalty || sd->inventory.u.items_inventory[n].option[i].id == battle_config.pet_random_full_loyalty_not_hungry);
++	else if( type == PET_NOT_HUNGRY && battle_config.pet_random_not_hungry )
++		ARR_FIND(0, MAX_ITEM_RDM_OPT, i, sd->inventory.u.items_inventory[n].option[i].id == battle_config.pet_random_not_hungry || sd->inventory.u.items_inventory[n].option[i].id == battle_config.pet_random_full_loyalty_not_hungry);
++
++	return ( i < MAX_ITEM_RDM_OPT ) ? true : false;
++}
++
+ /**
+  * Initialize pet data.
+  */
+ void do_init_pet(void)
+ {
+ 	pet_db.load();
++	pet_randomoption_db.load(); // [RomuloSM]: Pet Random Option
+ 
+ 	item_drop_ers = ers_new(sizeof(struct item_drop),"pet.cpp::item_drop_ers",ERS_OPT_NONE);
+ 	item_drop_list_ers = ers_new(sizeof(struct item_drop_list),"pet.cpp::item_drop_list_ers",ERS_OPT_NONE);
+@@ -2485,4 +2666,5 @@ void do_final_pet(void)
+ 	pet_autobonuses.clear();
+ 
+ 	pet_db.clear();
++	pet_randomoption_db.clear(); // [RomuloSM]: Pet Random Option
+ }
+diff --git a/src/map/pet.hpp b/src/map/pet.hpp
+index afef1db12..7f2566873 100644
+--- a/src/map/pet.hpp
++++ b/src/map/pet.hpp
+@@ -264,4 +264,29 @@ void pet_delautobonus(map_session_data &sd, std::vector<std::shared_ptr<s_petaut
+ void do_init_pet(void);
+ void do_final_pet(void);
+ 
++// [RomuloSM]: Pet Random Option
++struct s_pet_random_option {
++	t_itemid nameId;
++	uint16 randomopt_group;
++};
++
++class PetRandomOptionDatabase : public TypesafeYamlDatabase<t_itemid, s_pet_random_option> {
++public:
++	PetRandomOptionDatabase() : TypesafeYamlDatabase("PET_RANDOM_OPT_DB", 1) {
++
++	}
++
++	const std::string getDefaultLocation();
++	uint64 parseBodyNode(const ryml::NodeRef& node);
++};
++
++extern PetRandomOptionDatabase pet_randomoption_db;
++
++enum pet_special_opt : uint8 {
++	PET_FULL_LOYALTY = 0,
++	PET_NOT_HUNGRY
++};
++
++bool pet_check_special_options(map_session_data *sd, struct pet_data *pd, uint8 type);
++
+ #endif /* PET_HPP */
+diff --git a/src/map/script.cpp b/src/map/script.cpp
+index 2cd0e978c..69da33832 100644
+--- a/src/map/script.cpp
++++ b/src/map/script.cpp
+@@ -26977,6 +26977,122 @@ BUILDIN_FUNC(preg_match) {
+ #endif
+ }
+ 
++// [RomuloSM]: Adiciona um Random Option em um Ovo de Pet.
++//	pet_setrandomoption(<pet_id>,<index>,<id>,<value>,<param>{,<char id>});
++BUILDIN_FUNC(pet_setrandomoption) {
++	map_session_data *sd;
++	int i, pet_id, index, id, value, param;
++
++	if (!script_charid2sd(7, sd)) {
++		script_pushint(st, 0);
++		return SCRIPT_CMD_FAILURE;
++	}
++
++	pet_id = script_getnum(st, 2);
++	index = script_getnum(st, 3);
++	id = script_getnum(st, 4);
++	value = script_getnum(st, 5);
++	param = script_getnum(st, 6);
++
++	if( id ) {
++		std::shared_ptr<s_random_opt_data> opt = random_option_db.find(static_cast<uint16>(id));
++
++		if (opt == nullptr) {
++			ShowError("buildin_pet_setrandomoption: Random option ID %d does not exists.\n", id);
++			script_pushint(st, 0);
++			return SCRIPT_CMD_FAILURE;
++		}
++	}
++
++	if (index < 0 || index >= MAX_ITEM_RDM_OPT) {
++		ShowError("buildin_pet_setrandomoption: Invalid random option index %d.\n", index);
++		script_pushint(st, 0);
++		return SCRIPT_CMD_FAILURE;
++	}
++
++	ARR_FIND(0, MAX_INVENTORY, i, sd->inventory_data[i] && sd->inventory_data[i]->type == IT_PETEGG && sd->inventory.u.items_inventory[i].card[0] == CARD0_PET && sd->inventory.u.items_inventory[i].card[1] == GetWord(pet_id,0) && sd->inventory.u.items_inventory[i].card[2] == GetWord(pet_id,1) );
++
++	if( i < MAX_INVENTORY ) {
++		log_pick_pc(sd, LOG_TYPE_SCRIPT, -1, &sd->inventory.u.items_inventory[i]);
++		sd->inventory.u.items_inventory[i].option[index].id = id;
++		sd->inventory.u.items_inventory[i].option[index].value = value;
++		sd->inventory.u.items_inventory[i].option[index].param = param;
++		clif_delitem(sd, i, 1, 3);
++		log_pick_pc(sd, LOG_TYPE_SCRIPT, -1, &sd->inventory.u.items_inventory[i]);
++		clif_additem(sd, i, 1, 0);
++		script_pushint(st,1);
++	}
++	else {
++		ShowError("buildin_pet_setrandomoption: No Egge Pet %d (CID=%d/AID=%d).\n", pet_id, sd->status.char_id, sd->status.account_id);
++		script_pushint(st, 0);
++	}
++
++	return SCRIPT_CMD_SUCCESS;
++}
++
++// pet_getrandomoption <pet_id>,{,<char id>};
++BUILDIN_FUNC(pet_getrandomoption) {
++	map_session_data *sd;
++	int i, pet_id, j = 0;
++
++	if (!script_charid2sd(3, sd)) {
++		script_pushint(st, 0);
++		return SCRIPT_CMD_FAILURE;
++	}
++
++	pet_id = script_getnum(st, 2);
++
++	ARR_FIND(0, MAX_INVENTORY, i, sd->inventory_data[i] && sd->inventory_data[i]->type == IT_PETEGG && sd->inventory.u.items_inventory[i].card[0] == CARD0_PET && sd->inventory.u.items_inventory[i].card[1] == GetWord(pet_id,0) && sd->inventory.u.items_inventory[i].card[2] == GetWord(pet_id,1));
++	if( i < MAX_INVENTORY ) {
++		for( int k = 0; k < MAX_ITEM_RDM_OPT; k++ ) {
++			pc_setreg(sd,reference_uid(add_str("@pet_option_idx"), k), k);
++			pc_setreg(sd,reference_uid(add_str("@pet_option_id"), k),sd->inventory.u.items_inventory[i].option[k].id);
++			pc_setreg(sd,reference_uid(add_str("@pet_option_value"), k),sd->inventory.u.items_inventory[i].option[k].value);
++			pc_setreg(sd,reference_uid(add_str("@pet_option_parameter"), k),sd->inventory.u.items_inventory[i].option[k].param);
++
++			if( sd->inventory.u.items_inventory[i].option[k].id )
++				j++;
++		}
++
++		pc_setreg(sd,add_str("@pet_option_count"),j);
++	}
++	else {
++		ShowError("buildin_pet_getrandomoption: No Egge Pet %d (CID=%d/AID=%d).\n", pet_id, sd->status.char_id, sd->status.account_id);
++	}
++
++	script_pushint(st, j);
++	return SCRIPT_CMD_SUCCESS;	
++}
++
++// pet_checkrandomoption <pet_id>,<option_id>,{,<char id>};
++BUILDIN_FUNC(pet_checkrandomoption) {
++	map_session_data *sd;
++	int i, k, pet_id, id, j = 0;
++
++	if (!script_charid2sd(4, sd)) {
++		script_pushint(st, -1);
++		return SCRIPT_CMD_FAILURE;
++	}
++
++	pet_id = script_getnum(st, 2);
++	id = script_getnum(st, 3);
++
++	ARR_FIND(0, MAX_INVENTORY, i, sd->inventory_data[i] && sd->inventory_data[i]->type == IT_PETEGG && sd->inventory.u.items_inventory[i].card[0] == CARD0_PET && sd->inventory.u.items_inventory[i].card[1] == GetWord(pet_id,0) && sd->inventory.u.items_inventory[i].card[2] == GetWord(pet_id,1));
++	if( i < MAX_INVENTORY ) {
++		ARR_FIND(0, MAX_ITEM_RDM_OPT, k, sd->inventory.u.items_inventory[i].option[k].id == id);
++		if( k < MAX_ITEM_RDM_OPT )
++			script_pushint(st, k);
++		else
++			script_pushint(st, -1);
++	}
++	else {
++		ShowError("buildin_pet_checkrandomoption: No Egge Pet %d (CID=%d/AID=%d).\n", pet_id, sd->status.char_id, sd->status.account_id);
++		script_pushint(st, -1);
++	}
++
++	return SCRIPT_CMD_SUCCESS;	
++}
++
+ /// script command definitions
+ /// for an explanation on args, see add_buildin_func
+ struct script_function buildin_func[] = {
+@@ -27685,6 +27801,11 @@ struct script_function buildin_func[] = {
+ 	BUILDIN_DEF(isdead, "?"),
+ 	BUILDIN_DEF(macro_detector, "?"),
+ 
++	// [RomuloSM]: Pet Random Options
++	BUILDIN_DEF(pet_setrandomoption, "iiii?"),
++	BUILDIN_DEF(pet_getrandomoption, "i?"),
++	BUILDIN_DEF(pet_checkrandomoption, "ii?"),
++
+ #include <custom/script_def.inc>
+ 
+ 	{NULL,NULL,NULL},
+diff --git a/src/map/status.cpp b/src/map/status.cpp
+index ff16ea0a4..bd927b972 100644
+--- a/src/map/status.cpp
++++ b/src/map/status.cpp
+@@ -4034,6 +4034,31 @@ int status_calc_pc_sub(map_session_data* sd, uint8 opt)
+ 			run_script(data->script, 0, sd->bl.id, 0);
+ 	}
+ 
++	// [RomuloSM]: Pet Random Option
++	if( sd->pd ) {
++		struct pet_data *pd = sd->pd;
++		index = pet_egg_search( sd, pd->pet.pet_id );
++		if( sd->inventory_data[index] ) {
++			current_equip_item_index = index;
++			for (uint8 j = 0; j < MAX_ITEM_RDM_OPT; j++) {
++				short opt_id = sd->inventory.u.items_inventory[index].option[j].id;
++
++				if (!opt_id)
++					continue;
++				current_equip_opt_index = j;
++
++				std::shared_ptr<s_random_opt_data> data = random_option_db.find(opt_id);
++
++				if (!data || !data->script)
++					continue;
++				if (!pc_has_permission(sd, PC_PERM_USE_ALL_EQUIPMENT) && itemdb_type(sd->inventory.u.items_inventory[index].nameid) != IT_PETEGG )
++					continue;
++
++				run_script(data->script, 0, sd->bl.id, 0);
++			}
++		}
++	}
++
+ 	pc_bonus_script(sd);
+ 
+ 	if( sd->pd ) { // Pet Bonus

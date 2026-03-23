@@ -30,6 +30,7 @@
 #include "mercenary.hpp"
 #include "mob.hpp"
 #include "npc.hpp"
+#include "party.hpp"
 #include "path.hpp"
 #include "pc.hpp"
 #include "pc_groups.hpp"
@@ -3744,6 +3745,347 @@ bool status_calc_cart_weight(map_session_data *sd, enum e_status_calc_weight_opt
 	return true;
 }
 
+//Bonus per party member of the same job
+static int party_job_count_sub(struct block_list *bl, va_list ap)
+{
+	if (bl->type != BL_PC)
+		return 0;
+
+	map_session_data *member = (map_session_data*)bl;
+
+	int *count = va_arg(ap,int*);
+	int job = va_arg(ap,int);
+
+	if(member->status.class_ == job)
+		(*count)++;
+
+	return 0;
+}
+
+//Apply party job bonus to player status
+static void status_apply_party_job_bonus(map_session_data *sd, struct status_data *base_status)
+{
+	if(!sd || !sd->status.party_id)
+		return;
+
+	int count = 0;
+// TODO: Add bonuses for 3rd and 4th jobs | Split bonuses for 1st and 2nd jobs
+//--------------------------------
+// NOVICE - All Stats +1
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_NOVICE);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_NOVICE_HIGH);
+
+base_status->str += count * 1;
+base_status->agi += count * 1;
+base_status->vit += count * 1;
+base_status->int_ += count * 1;
+base_status->dex += count * 1;
+base_status->luk += count * 1;
+
+//--------------------------------
+// SWORDSMAN
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_SWORDMAN);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_SWORDMAN_HIGH);
+
+sd->hprecov_rate += count * 10;
+base_status->vit += count * 2;
+
+
+//--------------------------------
+// MAGE
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_MAGE);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_MAGE_HIGH);
+
+sd->castrate -= count * 10;
+base_status->int_ += count * 2;
+
+
+//--------------------------------
+// ARCHER
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_ARCHER);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_ARCHER_HIGH);
+
+base_status->hit += count * 10;
+base_status->dex += count * 2;
+
+
+//--------------------------------
+// ACOLYTE
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_ACOLYTE);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_ACOLYTE_HIGH);
+
+sd->sprecov_rate += count * 10;
+base_status->int_ += count * 2;
+
+
+//--------------------------------
+// MERCHANT - STR +2, Speed +10, Max Weight +2000
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_MERCHANT);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_MERCHANT_HIGH);
+
+base_status->str += count * 2;
+base_status->speed += count * 10;
+sd->add_max_weight += count * 2000;
+
+
+//--------------------------------
+// THIEF
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_THIEF);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_THIEF_HIGH);
+
+base_status->agi += count * 2;
+base_status->flee += count * 10;
+
+
+//--------------------------------
+// KNIGHT
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_KNIGHT);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_KNIGHT2);
+
+base_status->str += count * 3;
+sd->bonus.atk_rate += count * 10;
+
+//--------------------------------
+// LORD KNIGHT
+//--------------------------------
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_LORD_KNIGHT);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_LORD_KNIGHT2);
+
+base_status->str += count * 5;
+
+
+//--------------------------------
+// PRIEST
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_PRIEST);
+
+sd->sprecov_rate += count * 5;
+
+
+//--------------------------------
+// HIGH PRIEST
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_HIGH_PRIEST);
+
+sd->sprecov_rate += count * 5;
+
+
+//--------------------------------
+// WIZARD
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_WIZARD);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_HIGH_WIZARD);
+
+sd->matk_rate += count * 3;
+
+
+//--------------------------------
+// BLACKSMITH
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_BLACKSMITH);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_WHITESMITH);
+
+sd->bonus.atk_rate += count * 1;
+
+
+//--------------------------------
+// HUNTER
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_HUNTER);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_SNIPER);
+
+base_status->hit += count * 7;
+
+
+//--------------------------------
+// ASSASSIN
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_ASSASSIN);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_ASSASSIN_CROSS);
+
+base_status->cri += count * 5;
+
+
+//--------------------------------
+// CRUSADER
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_CRUSADER);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_CRUSADER2);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_PALADIN);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_PALADIN2);
+
+sd->def_rate += count * 2;
+
+
+//--------------------------------
+// MONK
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_MONK);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_CHAMPION);
+
+base_status->cri += count * 3;
+
+
+//--------------------------------
+// SAGE
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_SAGE);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_PROFESSOR);
+
+sd->matk_rate += count * 2;
+
+
+//--------------------------------
+// ROGUE
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_ROGUE);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_STALKER);
+
+base_status->flee += count * 4;
+
+
+//--------------------------------
+// ALCHEMIST
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_ALCHEMIST);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_CREATOR);
+
+sd->hprecov_rate += count * 4;
+
+
+//--------------------------------
+// BARD
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_BARD);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_CLOWN);
+
+sd->sprecov_rate += count * 4;
+
+
+//--------------------------------
+// DANCER
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_DANCER);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_GYPSY);
+
+sd->hprecov_rate += count * 4;
+
+
+//--------------------------------
+// SUPER NOVICE
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_SUPER_NOVICE);
+
+sd->bonus.atk_rate += count * 1;
+sd->matk_rate += count * 1;
+
+
+//--------------------------------
+// GUNSLINGER
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_GUNSLINGER);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_REBELLION);
+
+base_status->hit += count * 6;
+
+
+//--------------------------------
+// NINJA
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_NINJA);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_KAGEROU);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_OBORO);
+
+sd->matk_rate += count * 3;
+
+
+//--------------------------------
+// TAEKWON
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_TAEKWON);
+
+base_status->flee += count * 3;
+
+
+//--------------------------------
+// STAR GLADIATOR
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_STAR_GLADIATOR);
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_STAR_GLADIATOR2);
+
+sd->bonus.atk_rate += count * 2;
+
+
+//--------------------------------
+// SOUL LINKER
+//--------------------------------
+
+count = 0;
+party_foreachsamemap(party_job_count_sub, sd, 0, &count, JOB_SOUL_LINKER);
+
+sd->sprecov_rate += count * 6;
+}
+
 /**
  * Calculates player data from scratch without counting SC adjustments
  * Should be invoked whenever players raise stats, learn passive skills or change equipment
@@ -4198,6 +4540,30 @@ int32 status_calc_pc_sub(map_session_data* sd, uint8 opt)
 			}
 		}
 	}
+	// [RomuloSM]: Pet Random Option
+	if( sd->pd ) {
+		struct pet_data *pd = sd->pd;
+		index = pet_egg_search( sd, pd->pet.pet_id );
+		if( sd->inventory_data[index] ) {
+			current_equip_item_index = index;
+			for (uint8 j = 0; j < MAX_ITEM_RDM_OPT; j++) {
+				short opt_id = sd->inventory.u.items_inventory[index].option[j].id;
+
+				if (!opt_id)
+					continue;
+				current_equip_opt_index = j;
+
+				std::shared_ptr<s_random_opt_data> data = random_option_db.find(opt_id);
+
+				if (!data || !data->script)
+					continue;
+				if (!pc_has_permission(sd, PC_PERM_USE_ALL_EQUIPMENT) && itemdb_type(sd->inventory.u.items_inventory[index].nameid) != IT_PETEGG )
+					continue;
+
+						run_script(data->script, 0, sd->id, 0);
+			}
+		}
+	}
 
 	pc_bonus_script(sd);
 
@@ -4402,6 +4768,8 @@ int32 status_calc_pc_sub(map_session_data* sd, uint8 opt)
 
 // ----- MISC CALCULATION -----
 	status_calc_misc(sd, base_status, sd->status.base_level);
+	// Party Job Bonus System
+	status_apply_party_job_bonus(sd, base_status);
 
 	// Equipment modifiers for misc settings
 	if(sd->matk_rate < 0)
@@ -4962,6 +5330,10 @@ int32 status_calc_pc_sub(map_session_data* sd, uint8 opt)
 			sd->bonus.long_attack_atk_rate += i;
 		}
 	}
+	
+	// Party Job Bonus System
+	//status_apply_party_job_bonus(sd, base_status);
+	
 	status_cpy(&sd->battle_status, base_status);
 
 // ----- CLIENT-SIDE REFRESH -----

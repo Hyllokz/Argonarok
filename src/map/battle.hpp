@@ -768,6 +768,10 @@ struct Battle_Config
 	int32 feature_stylist;
 	int32 feature_banking_state_enforce;
 	int32 instance_allow_reconnect;
+	// [RomuloSM]: Pet Random Option
+	int pet_random_full_loyalty;
+	int pet_random_not_hungry;
+	int pet_random_full_loyalty_not_hungry;
 	int32 synchronize_damage;
 	int32 item_stacking;
 	int32 hom_delay_reset_vaporize;
